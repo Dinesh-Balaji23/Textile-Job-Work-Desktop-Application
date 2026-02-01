@@ -1,0 +1,24 @@
+{
+  "name": "textile-pos",
+  "version": "1.0.0",
+  "description": "Offline Textile Inventory & Billing POS built with Electron, React, and SQLite",
+  "main": "src/main/main.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "start": "npm run build && electron .",
+    "build:watch": "node scripts/build.js --watch",
+    "electron": "wait-on dist/renderer/index.js && electron .",
+    "dev": "concurrently \"npm:build:watch\" \"npm:electron\""
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sql.js": "^1.9.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^28.2.0",
+    "esbuild": "^0.19.12",
+    "wait-on": "^7.1.0"
+  }
+}
