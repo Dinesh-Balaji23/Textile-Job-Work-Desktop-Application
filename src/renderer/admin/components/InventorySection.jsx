@@ -13,7 +13,7 @@ export function InventorySection({
 }) {
   return (
     <section>
-      <h2>Inventory</h2>
+      <h2>Inventory Management</h2>
       <form className="form-grid" onSubmit={onSubmit}>
         <label>
           Item Name

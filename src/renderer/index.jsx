@@ -3,13 +3,21 @@ import { createRoot } from 'react-dom/client';
 import './styles.css';
 import { AppHeader } from './pos/components/AppHeader';
 import { TabBar } from './pos/components/TabBar';
-import { CompanySection } from './pos/components/CompanySection';
 import { CustomersSection } from './pos/components/CustomersSection';
-import { InventorySection } from './pos/components/InventorySection';
 import { BillingSection } from './pos/components/BillingSection';
 import { InvoicesSection } from './pos/components/InvoicesSection';
-import { TAB_DEFINITIONS, emptyCompany, emptyCustomer, emptyItem, units } from './pos/constants';
+import { TAB_DEFINITIONS, emptyCustomer } from './pos/constants';
 import { useStatusMessage } from './pos/hooks/useStatusMessage';
+
+import { AppHeader as AdminAppHeader } from './admin/components/AppHeader';
+import { TabBar as AdminTabBar } from './admin/components/TabBar';
+import { CompanySection } from './admin/components/CompanySection';
+import { InventorySection } from './admin/components/InventorySection';
+import { UserManagementSection } from './admin/components/UserManagementSection';
+import { GSTConfigurationSection } from './admin/components/GSTConfigurationSection';
+import { ReportingSection } from './admin/components/ReportingSection';
+import { TAB_DEFINITIONS as ADMIN_TAB_DEFINITIONS, emptyCompany, emptyItem, units } from './admin/constants';
+import { useStatusMessage as useAdminStatusMessage } from './admin/hooks/useStatusMessage';
 
 function LoginScreen({ onLogin, company }) {
   const [name, setName] = useState('');
@@ -67,16 +75,11 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
   const [activeTab, setActiveTab] = useState('billing');
   const [status, setStatus] = useStatusMessage();
 
-  const [companyForm, setCompanyForm] = useState(emptyCompany);
-  const [company, setCompany] = useState(initialCompany || null);
   const [customers, setCustomers] = useState([]);
   const [customerForm, setCustomerForm] = useState(emptyCustomer);
   const [editingCustomerId, setEditingCustomerId] = useState(null);
 
   const [items, setItems] = useState([]);
-  const [itemForm, setItemForm] = useState(emptyItem);
-  const [editingItemId, setEditingItemId] = useState(null);
-
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().slice(0, 10));
   const [invoiceCustomerId, setInvoiceCustomerId] = useState('');
   const [invoiceItems, setInvoiceItems] = useState([]);
@@ -90,18 +93,6 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
     refreshAll();
   }, []);
 
-  useEffect(() => {
-    if (initialCompany) {
-      setCompany(initialCompany);
-      setCompanyForm({
-        name: initialCompany.name || '',
-        gstin: initialCompany.gstin || '',
-        address: initialCompany.address || '',
-        phone: initialCompany.phone || ''
-      });
-    }
-  }, [initialCompany]);
-
   const invoiceSummary = useMemo(() => {
     const subtotal = invoiceItems.reduce((sum, item) => sum + (item.amount || 0), 0);
     const cgst = +(subtotal * 0.025).toFixed(2);
@@ -113,24 +104,12 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
 
   async function refreshAll() {
     try {
-      const [company, customerList, itemList, invoiceList, upcomingNo] = await Promise.all([
-        api.getCompany(),
+      const [customerList, itemList, invoiceList, upcomingNo] = await Promise.all([
         api.listCustomers(),
         api.listItems(),
         api.listInvoices(),
         api.getNextInvoiceNumber()
       ]);
-
-      if (company) {
-        setCompany(company);
-        setCompanyForm({
-          name: company.name || '',
-          gstin: company.gstin || '',
-          address: company.address || '',
-          phone: company.phone || ''
-        });
-        onCompanyChange?.(company);
-      }
 
       const customersData = customerList || [];
       setCustomers(customersData);
@@ -146,29 +125,9 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
     }
   }
 
-  const updateCompanyField = (field, value) => {
-    setCompanyForm((prev) => ({ ...prev, [field]: value }));
-  };
-
   const updateCustomerField = (field, value) => {
     setCustomerForm((prev) => ({ ...prev, [field]: value }));
   };
-
-  const updateItemField = (field, value) => {
-    setItemForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  async function handleCompanySave(event) {
-    event.preventDefault();
-    try {
-      const updated = await api.saveCompany(companyForm);
-      setCompany(updated);
-      onCompanyChange?.(updated);
-      setStatus({ type: 'success', text: 'Company details saved' });
-    } catch (error) {
-      setStatus({ type: 'error', text: error.message || 'Failed to save company' });
-    }
-  }
 
   async function refreshCustomers() {
     const list = await api.listCustomers();
@@ -225,48 +184,6 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
   async function refreshItems() {
     const list = await api.listItems();
     setItems(list || []);
-  }
-
-  function resetItemForm() {
-    setItemForm(emptyItem);
-    setEditingItemId(null);
-  }
-
-  async function handleItemSubmit(event) {
-    event.preventDefault();
-    if (!itemForm.name.trim()) {
-      setStatus({ type: 'error', text: 'Item name is required' });
-      return;
-    }
-    const payload = {
-      ...itemForm,
-      quantity: parseFloat(itemForm.quantity || 0),
-      rate: parseFloat(itemForm.rate || 0)
-    };
-    try {
-      if (editingItemId) {
-        await api.updateItem({ ...payload, id: editingItemId });
-        setStatus({ type: 'success', text: 'Item updated' });
-      } else {
-        await api.createItem(payload);
-        setStatus({ type: 'success', text: 'Item added' });
-      }
-      await refreshItems();
-      resetItemForm();
-    } catch (error) {
-      setStatus({ type: 'error', text: error.message || 'Failed to save item' });
-    }
-  }
-
-  function handleItemEdit(item) {
-    setItemForm({
-      name: item.name || '',
-      category: item.category || '',
-      unit: item.unit || 'Nos',
-      quantity: item.quantity?.toString() ?? '',
-      rate: item.rate?.toString() ?? ''
-    });
-    setEditingItemId(item.id);
   }
 
   function updateInvoiceItem(id, updates) {
@@ -372,7 +289,7 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
 
   return (
     <div className="app-shell">
-      <AppHeader onLogout={onLogout} user={user} company={company} />
+      <AppHeader onLogout={onLogout} user={user} company={initialCompany} />
 
       <TabBar tabs={TAB_DEFINITIONS} activeTab={activeTab} onChange={setActiveTab} />
 
@@ -383,14 +300,6 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
       )}
 
       <main>
-        {activeTab === 'company' && (
-          <CompanySection
-            form={companyForm}
-            onFieldChange={updateCompanyField}
-            onSubmit={handleCompanySave}
-          />
-        )}
-
         {activeTab === 'customers' && (
           <CustomersSection
             form={customerForm}
@@ -401,19 +310,6 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
             onEdit={handleCustomerEdit}
             onDelete={handleCustomerDelete}
             onCancelEdit={resetCustomerForm}
-          />
-        )}
-
-        {activeTab === 'inventory' && (
-          <InventorySection
-            form={itemForm}
-            editingItemId={editingItemId}
-            units={units}
-            items={items}
-            onFieldChange={updateItemField}
-            onSubmit={handleItemSubmit}
-            onEdit={handleItemEdit}
-            onCancelEdit={resetItemForm}
           />
         )}
 
@@ -450,6 +346,168 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
   );
 }
 
+function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
+  const api = window.api;
+  const [activeTab, setActiveTab] = useState('company');
+  const [status, setStatus] = useAdminStatusMessage();
+
+  const [companyForm, setCompanyForm] = useState(emptyCompany);
+  const [company, setCompany] = useState(initialCompany || null);
+  const [items, setItems] = useState([]);
+  const [itemForm, setItemForm] = useState(emptyItem);
+  const [editingItemId, setEditingItemId] = useState(null);
+
+  useEffect(() => {
+    refreshAll();
+  }, []);
+
+  useEffect(() => {
+    if (initialCompany) {
+      setCompany(initialCompany);
+      setCompanyForm({
+        name: initialCompany.name || '',
+        gstin: initialCompany.gstin || '',
+        address: initialCompany.address || '',
+        phone: initialCompany.phone || ''
+      });
+    }
+  }, [initialCompany]);
+
+  async function refreshAll() {
+    try {
+      const [companyData, itemList] = await Promise.all([
+        api.getCompany(),
+        api.listItems()
+      ]);
+
+      if (companyData) {
+        setCompany(companyData);
+        setCompanyForm({
+          name: companyData.name || '',
+          gstin: companyData.gstin || '',
+          address: companyData.address || '',
+          phone: companyData.phone || ''
+        });
+        onCompanyChange?.(companyData);
+      }
+
+      setItems(itemList || []);
+    } catch (error) {
+      setStatus({ type: 'error', text: error.message || 'Failed to load data' });
+    }
+  }
+
+  const updateCompanyField = (field, value) => {
+    setCompanyForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const updateItemField = (field, value) => {
+    setItemForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  async function handleCompanySave(event) {
+    event.preventDefault();
+    try {
+      const updated = await api.saveCompany(companyForm);
+      setCompany(updated);
+      onCompanyChange?.(updated);
+      setStatus({ type: 'success', text: 'Company details saved' });
+    } catch (error) {
+      setStatus({ type: 'error', text: error.message || 'Failed to save company' });
+    }
+  }
+
+  async function refreshItems() {
+    const list = await api.listItems();
+    setItems(list || []);
+  }
+
+  function resetItemForm() {
+    setItemForm(emptyItem);
+    setEditingItemId(null);
+  }
+
+  async function handleItemSubmit(event) {
+    event.preventDefault();
+    if (!itemForm.name.trim()) {
+      setStatus({ type: 'error', text: 'Item name is required' });
+      return;
+    }
+    const payload = {
+      ...itemForm,
+      quantity: parseFloat(itemForm.quantity || 0),
+      rate: parseFloat(itemForm.rate || 0)
+    };
+    try {
+      if (editingItemId) {
+        await api.updateItem({ ...payload, id: editingItemId });
+        setStatus({ type: 'success', text: 'Item updated' });
+      } else {
+        await api.createItem(payload);
+        setStatus({ type: 'success', text: 'Item added' });
+      }
+      await refreshItems();
+      resetItemForm();
+    } catch (error) {
+      setStatus({ type: 'error', text: error.message || 'Failed to save item' });
+    }
+  }
+
+  function handleItemEdit(item) {
+    setItemForm({
+      name: item.name || '',
+      category: item.category || '',
+      unit: item.unit || 'Nos',
+      quantity: item.quantity?.toString() ?? '',
+      rate: item.rate?.toString() ?? ''
+    });
+    setEditingItemId(item.id);
+  }
+
+  return (
+    <div className="app-shell">
+      <AdminAppHeader onLogout={onLogout} user={user} company={company} />
+
+      <AdminTabBar tabs={ADMIN_TAB_DEFINITIONS} activeTab={activeTab} onChange={setActiveTab} />
+
+      {status && (
+        <div className={`status ${status.type}`}>
+          {status.text}
+        </div>
+      )}
+
+      <main>
+        {activeTab === 'company' && (
+          <CompanySection
+            form={companyForm}
+            onFieldChange={updateCompanyField}
+            onSubmit={handleCompanySave}
+          />
+        )}
+
+        {activeTab === 'inventory' && (
+          <InventorySection
+            form={itemForm}
+            editingItemId={editingItemId}
+            units={units}
+            items={items}
+            onFieldChange={updateItemField}
+            onSubmit={handleItemSubmit}
+            onEdit={handleItemEdit}
+            onCancelEdit={resetItemForm}
+          />
+        )}
+
+        {activeTab === 'users' && <UserManagementSection />}
+
+        {activeTab === 'gst' && <GSTConfigurationSection />}
+
+        {activeTab === 'reports' && <ReportingSection />}
+      </main>
+    </div>
+  );
+}
+
 function App() {
   const [user, setUser] = useState(null);
   const [company, setCompany] = useState(null);
@@ -467,10 +525,12 @@ function App() {
 
   if (user.role === 'admin') {
     return (
-      <div className="app-shell">
-        <AppHeader onLogout={() => setUser(null)} user={user} company={company} />
-        <div className="placeholder">Admin dashboard coming soon.</div>
-      </div>
+      <AdminApp
+        onLogout={() => setUser(null)}
+        user={user}
+        initialCompany={company}
+        onCompanyChange={setCompany}
+      />
     );
   }
 
