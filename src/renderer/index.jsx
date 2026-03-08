@@ -498,6 +498,16 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
     }
   }
 
+  const handleItemDelete = async (id) => {
+    try {
+      await window.api.deleteItem(id);
+      setStatus({ type: 'success', text: 'Item deleted successfully' });
+      await refreshItems();
+    } catch (error) {
+      setStatus({ type: 'error', text: error.message || 'Failed to delete item' });
+    }
+  };
+
   function handleItemEdit(item) {
     setItemForm({
       name: item.name || '',
@@ -540,6 +550,8 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
             onSubmit={handleItemSubmit}
             onEdit={handleItemEdit}
             onCancelEdit={resetItemForm}
+            onRefresh={refreshItems}
+            onDelete={handleItemDelete} // Add delete callback
           />
         )}
 

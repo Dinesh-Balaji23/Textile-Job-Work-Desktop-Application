@@ -505,6 +505,13 @@ async function adjustItemQuantity(id, quantity) {
   return getItem(id);
 }
 
+async function deleteItem(id) {
+  const db = await getDb();
+  run(db, 'DELETE FROM items WHERE id = :id', { id });
+  await persist();
+  return true;
+}
+
 async function getItem(id) {
   const db = await getDb();
   return queryOne(db, 'SELECT * FROM items WHERE id = :id', { id });
@@ -657,6 +664,7 @@ module.exports = {
   listItems,
   createItem,
   updateItem,
+  deleteItem,
   adjustItemQuantity,
   listInvoices,
   createInvoice,

@@ -1090,7 +1090,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState7(initialState) {
+        function useState8(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1893,7 +1893,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo2;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState7;
+        exports.useState = useState8;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -57817,34 +57817,215 @@ function InventorySection({
   onFieldChange,
   onSubmit,
   onEdit,
-  onCancelEdit
+  onCancelEdit,
+  onRefresh,
+  onDelete
+  // Add delete callback
 }) {
-  return /* @__PURE__ */ import_react11.default.createElement("section", null, /* @__PURE__ */ import_react11.default.createElement("h2", null, "Inventory Management"), /* @__PURE__ */ import_react11.default.createElement("form", { className: "form-grid", onSubmit }, /* @__PURE__ */ import_react11.default.createElement("label", null, "Item Name", /* @__PURE__ */ import_react11.default.createElement(
+  const [csvFile, setCsvFile] = (0, import_react11.useState)(null);
+  const [isImporting, setIsImporting] = (0, import_react11.useState)(false);
+  const [deleteStatus, setDeleteStatus] = (0, import_react11.useState)(null);
+  const [filterCategory, setFilterCategory] = (0, import_react11.useState)("all");
+  const [searchTerm, setSearchTerm] = (0, import_react11.useState)("");
+  const handleCSVUpload = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === "text/csv") {
+      setCsvFile(file);
+    } else {
+      alert("Please upload a valid CSV file");
+    }
+  };
+  const parseCSV = (text2) => {
+    const lines = text2.trim().split("\n");
+    if (lines.length < 2)
+      return [];
+    const headers = lines[0].split(",").map((h3) => h3.trim().toLowerCase());
+    const data = [];
+    for (let i3 = 1; i3 < lines.length; i3++) {
+      const values = lines[i3].split(",").map((v3) => v3.trim());
+      if (values.length >= 4) {
+        data.push({
+          name: values[0] || "",
+          category: values[1] || "",
+          unit: values[2] || "pieces",
+          rate: parseFloat(values[3]) || 0,
+          quantity: parseFloat(values[4]) || 0
+        });
+      }
+    }
+    return data;
+  };
+  const handleImport = async () => {
+    if (!csvFile) {
+      alert("Please select a CSV file first");
+      return;
+    }
+    setIsImporting(true);
+    try {
+      const text2 = await csvFile.text();
+      const importItems = parseCSV(text2);
+      if (importItems.length === 0) {
+        alert("No valid items found in CSV file");
+        setIsImporting(false);
+        return;
+      }
+      const existingItems = items || [];
+      const existingItemMap = /* @__PURE__ */ new Map();
+      existingItems.forEach((item) => {
+        existingItemMap.set(item.name.toLowerCase().trim(), item);
+      });
+      let updatedCount = 0;
+      let addedCount = 0;
+      for (const importItem of importItems) {
+        try {
+          const existingItem = existingItemMap.get(importItem.name.toLowerCase().trim());
+          if (existingItem) {
+            const updatedQuantity = existingItem.quantity + importItem.quantity;
+            await window.api.updateItem({
+              ...existingItem,
+              quantity: updatedQuantity
+            });
+            updatedCount++;
+          } else {
+            await window.api.createItem(importItem);
+            addedCount++;
+          }
+        } catch (error) {
+          console.error("Failed to process item:", importItem.name, error);
+        }
+      }
+      const message = [];
+      if (updatedCount > 0) {
+        message.push(`Updated ${updatedCount} existing items`);
+      }
+      if (addedCount > 0) {
+        message.push(`Added ${addedCount} new items`);
+      }
+      alert(`Import complete: ${message.join(", ")}`);
+      setCsvFile(null);
+      document.getElementById("csv-upload").value = "";
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      alert("Failed to import CSV: " + error.message);
+    } finally {
+      setIsImporting(false);
+    }
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
+      return;
+    }
+    try {
+      await window.api.deleteItem(id);
+      setDeleteStatus("Item deleted successfully");
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      setDeleteStatus("Failed to delete item: " + error.message);
+    }
+  };
+  import_react11.default.useEffect(() => {
+    if (deleteStatus) {
+      const timer = setTimeout(() => setDeleteStatus(null), 3e3);
+      return () => clearTimeout(timer);
+    }
+  }, [deleteStatus]);
+  const showDeleteStatus = onDelete && typeof onDelete === "function";
+  const filteredItems = items.filter((item) => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.category && item.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === "all" || item.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+  const categories = ["all", ...new Set(items.map((item) => item.category).filter(Boolean))];
+  return /* @__PURE__ */ import_react11.default.createElement("section", { className: "inventory-section" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-header" }, /* @__PURE__ */ import_react11.default.createElement("h2", null, "Inventory Management"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-stats" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "stat-card" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "stat-number" }, items.length), /* @__PURE__ */ import_react11.default.createElement("span", { className: "stat-label" }, "Total Items")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "stat-card" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "stat-number" }, items.reduce((sum, item) => sum + item.quantity, 0)), /* @__PURE__ */ import_react11.default.createElement("span", { className: "stat-label" }, "Total Quantity")))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-list-main" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "list-header" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, "Item Inventory"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "list-filters" }, /* @__PURE__ */ import_react11.default.createElement(
+    "input",
+    {
+      type: "text",
+      placeholder: "Search items...",
+      value: searchTerm,
+      onChange: (e2) => setSearchTerm(e2.target.value),
+      className: "search-input"
+    }
+  ), /* @__PURE__ */ import_react11.default.createElement(
+    "select",
+    {
+      value: filterCategory,
+      onChange: (e2) => setFilterCategory(e2.target.value),
+      className: "category-filter"
+    },
+    categories.map((category) => /* @__PURE__ */ import_react11.default.createElement("option", { key: category, value: category }, category === "all" ? "All Categories" : category))
+  ))), showDeleteStatus && deleteStatus && /* @__PURE__ */ import_react11.default.createElement("div", { className: `delete-status ${deleteStatus.includes("success") ? "success" : "error"}` }, deleteStatus), /* @__PURE__ */ import_react11.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react11.default.createElement("table", { className: "inventory-table" }, /* @__PURE__ */ import_react11.default.createElement("thead", null, /* @__PURE__ */ import_react11.default.createElement("tr", null, /* @__PURE__ */ import_react11.default.createElement("th", null, "Item Name"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Category"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Unit"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Stock"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Rate"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Value"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react11.default.createElement("tbody", null, filteredItems.length > 0 ? filteredItems.map((item) => /* @__PURE__ */ import_react11.default.createElement("tr", { key: item.id, className: "inventory-row" }, /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-name" }, item.name), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-category" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "category-badge" }, item.category || "Uncategorized")), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-unit" }, item.unit), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-quantity" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: `quantity-badge ${item.quantity < 10 ? "low-stock" : "in-stock"}` }, item.quantity)), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-rate" }, formatCurrency2(item.rate)), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-value" }, formatCurrency2(item.quantity * item.rate)), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-actions" }, /* @__PURE__ */ import_react11.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => onEdit(item),
+      className: "action-btn edit-btn"
+    },
+    "Edit"
+  ), /* @__PURE__ */ import_react11.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleDelete(item.id),
+      className: "action-btn delete-btn"
+    },
+    "Delete"
+  )))) : /* @__PURE__ */ import_react11.default.createElement("tr", null, /* @__PURE__ */ import_react11.default.createElement("td", { colSpan: 7, className: "empty-state" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "empty-message" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "empty-icon" }, "\u{1F4E6}"), /* @__PURE__ */ import_react11.default.createElement("p", null, "No items found"), /* @__PURE__ */ import_react11.default.createElement("p", null, "Try adjusting your search or add new items")))))))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-forms-section" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-form" }, /* @__PURE__ */ import_react11.default.createElement("form", { className: "form-grid", onSubmit }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "form-section" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, editingItemId ? "Edit Item" : "Add New Item"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "form-grid" }, /* @__PURE__ */ import_react11.default.createElement("label", null, "Item Name", /* @__PURE__ */ import_react11.default.createElement(
     "input",
     {
       required: true,
       value: form.name,
-      onChange: (e2) => onFieldChange("name", e2.target.value)
+      onChange: (e2) => onFieldChange("name", e2.target.value),
+      placeholder: "Enter item name"
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Category", /* @__PURE__ */ import_react11.default.createElement("input", { value: form.category, onChange: (e2) => onFieldChange("category", e2.target.value) })), /* @__PURE__ */ import_react11.default.createElement("label", null, "Unit", /* @__PURE__ */ import_react11.default.createElement("select", { value: form.unit, onChange: (e2) => onFieldChange("unit", e2.target.value) }, units2.map((unit) => /* @__PURE__ */ import_react11.default.createElement("option", { key: unit, value: unit }, unit)))), /* @__PURE__ */ import_react11.default.createElement("label", null, "Available Qty", /* @__PURE__ */ import_react11.default.createElement(
+  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Category", /* @__PURE__ */ import_react11.default.createElement(
+    "input",
+    {
+      value: form.category,
+      onChange: (e2) => onFieldChange("category", e2.target.value),
+      placeholder: "e.g., Clothing, Accessories"
+    }
+  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Unit", /* @__PURE__ */ import_react11.default.createElement("select", { value: form.unit, onChange: (e2) => onFieldChange("unit", e2.target.value) }, units2.map((unit) => /* @__PURE__ */ import_react11.default.createElement("option", { key: unit, value: unit }, unit)))), /* @__PURE__ */ import_react11.default.createElement("label", null, "Available Qty", /* @__PURE__ */ import_react11.default.createElement(
     "input",
     {
       type: "number",
       min: "0",
       step: "0.01",
       value: form.quantity,
-      onChange: (e2) => onFieldChange("quantity", e2.target.value)
+      onChange: (e2) => onFieldChange("quantity", e2.target.value),
+      placeholder: "0"
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Rate", /* @__PURE__ */ import_react11.default.createElement(
+  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Rate (\u20B9)", /* @__PURE__ */ import_react11.default.createElement(
     "input",
     {
       type: "number",
       min: "0",
       step: "0.01",
       value: form.rate,
-      onChange: (e2) => onFieldChange("rate", e2.target.value)
+      onChange: (e2) => onFieldChange("rate", e2.target.value),
+      placeholder: "0.00"
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "submit" }, editingItemId ? "Update Item" : "Add Item"), editingItemId && /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", className: "secondary", onClick: onCancelEdit }, "Cancel Edit"))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react11.default.createElement("table", null, /* @__PURE__ */ import_react11.default.createElement("thead", null, /* @__PURE__ */ import_react11.default.createElement("tr", null, /* @__PURE__ */ import_react11.default.createElement("th", null, "Name"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Category"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Unit"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Available Qty"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Rate"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react11.default.createElement("tbody", null, items.map((item) => /* @__PURE__ */ import_react11.default.createElement("tr", { key: item.id }, /* @__PURE__ */ import_react11.default.createElement("td", null, item.name), /* @__PURE__ */ import_react11.default.createElement("td", null, item.category || "-"), /* @__PURE__ */ import_react11.default.createElement("td", null, item.unit), /* @__PURE__ */ import_react11.default.createElement("td", null, item.quantity), /* @__PURE__ */ import_react11.default.createElement("td", null, formatCurrency2(item.rate)), /* @__PURE__ */ import_react11.default.createElement("td", null, /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", onClick: () => onEdit(item) }, "Edit")))), !items.length && /* @__PURE__ */ import_react11.default.createElement("tr", null, /* @__PURE__ */ import_react11.default.createElement("td", { colSpan: 6, className: "empty" }, "No items added yet."))))));
+  ))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "submit", className: "primary" }, editingItemId ? "Update Item" : "Add Item"), editingItemId && /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", className: "secondary", onClick: onCancelEdit }, "Cancel"))))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "csv-import-section" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, "Bulk Import"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "csv-upload-area" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "file-upload-wrapper" }, /* @__PURE__ */ import_react11.default.createElement("label", { htmlFor: "csv-upload", className: "file-upload-btn" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "upload-icon" }, "\u{1F4C1}"), /* @__PURE__ */ import_react11.default.createElement("span", null, csvFile ? csvFile.name : "Choose CSV File"), /* @__PURE__ */ import_react11.default.createElement(
+    "input",
+    {
+      id: "csv-upload",
+      type: "file",
+      accept: ".csv",
+      onChange: handleCSVUpload
+    }
+  ))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "csv-format-info" }, /* @__PURE__ */ import_react11.default.createElement("h4", null, "CSV Format:"), /* @__PURE__ */ import_react11.default.createElement("code", null, "name, category, unit, rate, quantity"), /* @__PURE__ */ import_react11.default.createElement("p", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, "Example:"), " Shirt, Clothing, pieces, 150, 50")), /* @__PURE__ */ import_react11.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleImport,
+      disabled: !csvFile || isImporting,
+      className: "import-btn primary"
+    },
+    isImporting ? "Importing..." : "Import Items"
+  )))));
 }
 
 // src/renderer/admin/components/UserManagementSection.jsx
@@ -58505,6 +58686,15 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
       setStatus({ type: "error", text: error.message || "Failed to save item" });
     }
   }
+  const handleItemDelete = async (id) => {
+    try {
+      await window.api.deleteItem(id);
+      setStatus({ type: "success", text: "Item deleted successfully" });
+      await refreshItems();
+    } catch (error) {
+      setStatus({ type: "error", text: error.message || "Failed to delete item" });
+    }
+  };
   function handleItemEdit(item) {
     setItemForm({
       name: item.name || "",
@@ -58532,7 +58722,9 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
       onFieldChange: updateItemField,
       onSubmit: handleItemSubmit,
       onEdit: handleItemEdit,
-      onCancelEdit: resetItemForm
+      onCancelEdit: resetItemForm,
+      onRefresh: refreshItems,
+      onDelete: handleItemDelete
     }
   ), activeTab === "users" && /* @__PURE__ */ import_react16.default.createElement(UserManagementSection, null), activeTab === "gst" && /* @__PURE__ */ import_react16.default.createElement(GSTConfigurationSection, null), activeTab === "reports" && /* @__PURE__ */ import_react16.default.createElement(ReportingSection, null)));
 }

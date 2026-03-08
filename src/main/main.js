@@ -1,5 +1,14 @@
 const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
+
+const isDev = process.env.NODE_ENV === 'development';
+const databaseFile = path.join(app.getPath('userData'), 'textile-pos.db');
+const rendererEntry = path.join(__dirname, '../../dist/renderer/index.html');
+const projectDbPath = path.join(__dirname, '../../data/textile-pos.db');
+
+// Clear require cache to force reload of database module
+delete require.cache[require.resolve('./database')];
+
 const {
   initializeDatabase,
   authenticateUser,
@@ -21,17 +30,13 @@ const {
   listItems,
   createItem,
   updateItem,
+  deleteItem,
   adjustItemQuantity,
   listInvoices,
   createInvoice,
   getInvoiceDetails,
   getNextInvoiceNumber
 } = require('./database');
-
-const isDev = process.env.NODE_ENV === 'development';
-const databaseFile = path.join(app.getPath('userData'), 'textile-pos.db');
-const rendererEntry = path.join(__dirname, '../../dist/renderer/index.html');
-const projectDbPath = path.join(__dirname, '../../data/textile-pos.db');
 let mainWindow;
 
 function createMainWindow() {
@@ -83,6 +88,7 @@ function registerIpcHandlers() {
   ipcMain.handle('db:listItems', () => listItems());
   ipcMain.handle('db:createItem', (_, payload) => createItem(payload));
   ipcMain.handle('db:updateItem', (_, payload) => updateItem(payload.id, payload));
+  ipcMain.handle('db:deleteItem', (_, id) => deleteItem(id));
   ipcMain.handle('db:adjustItemQuantity', (_, payload) => adjustItemQuantity(payload.id, payload.quantity));
 
   ipcMain.handle('db:listInvoices', () => listInvoices());
