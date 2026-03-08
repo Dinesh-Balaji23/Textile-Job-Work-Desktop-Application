@@ -2,6 +2,10 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 const channels = {
   login: 'auth:login',
+  listUsers: 'db:listUsers',
+  createUser: 'db:createUser',
+  updateUser: 'db:updateUser',
+  deleteUser: 'db:deleteUser',
   getCompany: 'db:getCompany',
   saveCompany: 'db:saveCompany',
   listCustomers: 'db:listCustomers',
@@ -20,6 +24,10 @@ const channels = {
 
 contextBridge.exposeInMainWorld('api', {
   login: (credentials) => ipcRenderer.invoke(channels.login, credentials),
+  listUsers: () => ipcRenderer.invoke(channels.listUsers),
+  createUser: (payload) => ipcRenderer.invoke(channels.createUser, payload),
+  updateUser: (payload) => ipcRenderer.invoke(channels.updateUser, payload),
+  deleteUser: (id) => ipcRenderer.invoke(channels.deleteUser, id),
   getCompany: () => ipcRenderer.invoke(channels.getCompany),
   saveCompany: (payload) => ipcRenderer.invoke(channels.saveCompany, payload),
   listCustomers: () => ipcRenderer.invoke(channels.listCustomers),

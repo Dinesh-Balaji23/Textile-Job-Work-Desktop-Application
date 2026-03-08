@@ -188,6 +188,67 @@ async function authenticateUser({ name, password }) {
   });
 }
 
+async function listUsers() {
+  const db = await getDb();
+  return queryAll(db, 'SELECT id, name, role FROM users ORDER BY name');
+}
+
+async function createUser(user) {
+  const db = await getDb();
+  run(
+    db,
+    `INSERT INTO users (name, password, role)
+     VALUES (:name, :password, :role)`,
+    user
+  );
+  const id = lastInsertRowId(db);
+  await persist();
+  return getUser(id);
+}
+
+async function updateUser(id, user) {
+  const db = await getDb();
+  const updates = [];
+  const params = { id };
+  
+  if (user.name !== undefined) {
+    updates.push('name = :name');
+    params.name = user.name;
+  }
+  if (user.password !== undefined) {
+    updates.push('password = :password');
+    params.password = user.password;
+  }
+  if (user.role !== undefined) {
+    updates.push('role = :role');
+    params.role = user.role;
+  }
+  
+  if (updates.length === 0) {
+    throw new Error('No fields to update');
+  }
+  
+  run(
+    db,
+    `UPDATE users SET ${updates.join(', ')} WHERE id = :id`,
+    params
+  );
+  await persist();
+  return getUser(id);
+}
+
+async function deleteUser(id) {
+  const db = await getDb();
+  run(db, 'DELETE FROM users WHERE id = :id', { id });
+  await persist();
+  return listUsers();
+}
+
+async function getUser(id) {
+  const db = await getDb();
+  return queryOne(db, 'SELECT id, name, role FROM users WHERE id = :id', { id });
+}
+
 async function saveCompany(payload) {
   const db = await getDb();
   run(
@@ -430,6 +491,11 @@ async function getNextInvoiceNumber() {
 module.exports = {
   initializeDatabase,
   authenticateUser,
+  listUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  getUser,
   getCompany,
   saveCompany,
   listCustomers,

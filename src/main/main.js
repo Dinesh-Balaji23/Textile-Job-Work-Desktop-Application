@@ -3,6 +3,10 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const {
   initializeDatabase,
   authenticateUser,
+  listUsers,
+  createUser,
+  updateUser,
+  deleteUser,
   getCompany,
   saveCompany,
   listCustomers,
@@ -51,6 +55,12 @@ function createMainWindow() {
 
 function registerIpcHandlers() {
   ipcMain.handle('auth:login', (_, credentials) => authenticateUser(credentials));
+
+  // User management
+  ipcMain.handle('db:listUsers', () => listUsers());
+  ipcMain.handle('db:createUser', (_, payload) => createUser(payload));
+  ipcMain.handle('db:updateUser', (_, payload) => updateUser(payload.id, payload));
+  ipcMain.handle('db:deleteUser', (_, id) => deleteUser(id));
 
   ipcMain.handle('db:getCompany', () => getCompany());
   ipcMain.handle('db:saveCompany', (_, payload) => saveCompany(payload));

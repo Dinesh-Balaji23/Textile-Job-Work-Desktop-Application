@@ -13,7 +13,9 @@ export function AppHeader({ onLogout, user, company }) {
       </div>
       {user && (
         <div className="header-actions">
-          <span className="badge">{user.role === 'admin' ? 'Admin' : 'POS'}</span>
+          <span className="badge">
+            {user.role === 'admin' ? 'ADMIN' : 'POS'} - {user.name?.toUpperCase()}
+          </span>
           <button type="button" className="secondary" onClick={onLogout}>
             Logout
           </button>

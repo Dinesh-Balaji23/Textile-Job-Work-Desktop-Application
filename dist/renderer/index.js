@@ -1083,7 +1083,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState4(initialState) {
+        function useState5(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1095,7 +1095,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect3(create, deps) {
+        function useEffect4(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1878,7 +1878,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect3;
+        exports.useEffect = useEffect4;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -1886,7 +1886,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo2;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState4;
+        exports.useState = useState5;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -23560,7 +23560,7 @@ var import_react = __toESM(require_react());
 function AppHeader({ onLogout, user, company }) {
   const name = company?.name?.trim() || "Textile Job Work POS";
   const location = company?.address?.trim() || "Location pending";
-  return /* @__PURE__ */ import_react.default.createElement("header", { className: "app-header" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "logo-circle" }, name?.slice(0, 2)?.toUpperCase() || "TP"), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("p", { className: "subtitle" }, location), /* @__PURE__ */ import_react.default.createElement("h1", null, name)), user && /* @__PURE__ */ import_react.default.createElement("div", { className: "header-actions" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "badge" }, user.role === "admin" ? "Admin" : "POS"), /* @__PURE__ */ import_react.default.createElement("button", { type: "button", className: "secondary", onClick: onLogout }, "Logout")));
+  return /* @__PURE__ */ import_react.default.createElement("header", { className: "app-header" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "logo-circle" }, name?.slice(0, 2)?.toUpperCase() || "TP"), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("p", { className: "subtitle" }, location), /* @__PURE__ */ import_react.default.createElement("h1", null, name)), user && /* @__PURE__ */ import_react.default.createElement("div", { className: "header-actions" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "badge" }, user.role === "admin" ? "ADMIN" : "POS", " - ", user.name?.toUpperCase()), /* @__PURE__ */ import_react.default.createElement("button", { type: "button", className: "secondary", onClick: onLogout }, "Logout")));
 }
 
 // src/renderer/pos/components/TabBar.jsx
@@ -23729,7 +23729,7 @@ var import_react7 = __toESM(require_react());
 function AppHeader2({ onLogout, user, company }) {
   const name = company?.name?.trim() || "Textile Job Work POS";
   const location = company?.address?.trim() || "Location pending";
-  return /* @__PURE__ */ import_react7.default.createElement("header", { className: "app-header" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "logo-circle" }, name?.slice(0, 2)?.toUpperCase() || "TP"), /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement("p", { className: "subtitle" }, location), /* @__PURE__ */ import_react7.default.createElement("h1", null, name)), user && /* @__PURE__ */ import_react7.default.createElement("div", { className: "header-actions" }, /* @__PURE__ */ import_react7.default.createElement("span", { className: "badge" }, user.role === "admin" ? "Admin" : "POS"), /* @__PURE__ */ import_react7.default.createElement("button", { type: "button", className: "secondary", onClick: onLogout }, "Logout")));
+  return /* @__PURE__ */ import_react7.default.createElement("header", { className: "app-header" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "logo-circle" }, name?.slice(0, 2)?.toUpperCase() || "TP"), /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement("p", { className: "subtitle" }, location), /* @__PURE__ */ import_react7.default.createElement("h1", null, name)), user && /* @__PURE__ */ import_react7.default.createElement("div", { className: "header-actions" }, /* @__PURE__ */ import_react7.default.createElement("span", { className: "badge" }, user.role === "admin" ? "ADMIN" : "POS", " - ", user.name?.toUpperCase()), /* @__PURE__ */ import_react7.default.createElement("button", { type: "button", className: "secondary", onClick: onLogout }, "Logout")));
 }
 
 // src/renderer/admin/components/TabBar.jsx
@@ -23818,7 +23818,131 @@ function InventorySection({
 // src/renderer/admin/components/UserManagementSection.jsx
 var import_react11 = __toESM(require_react());
 function UserManagementSection() {
-  return /* @__PURE__ */ import_react11.default.createElement("section", null, /* @__PURE__ */ import_react11.default.createElement("h2", null, "User Management"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "placeholder" }, /* @__PURE__ */ import_react11.default.createElement("p", null, "User management functionality coming soon."), /* @__PURE__ */ import_react11.default.createElement("p", null, "This will include:"), /* @__PURE__ */ import_react11.default.createElement("ul", null, /* @__PURE__ */ import_react11.default.createElement("li", null, "Add new users"), /* @__PURE__ */ import_react11.default.createElement("li", null, "Edit user details"), /* @__PURE__ */ import_react11.default.createElement("li", null, "Assign user roles"), /* @__PURE__ */ import_react11.default.createElement("li", null, "Manage user permissions"))));
+  const [users, setUsers] = (0, import_react11.useState)([]);
+  const [userForm, setUserForm] = (0, import_react11.useState)({
+    name: "",
+    password: "",
+    role: "pos"
+  });
+  const [editingUserId, setEditingUserId] = (0, import_react11.useState)(null);
+  const [status, setStatus] = (0, import_react11.useState)(null);
+  (0, import_react11.useEffect)(() => {
+    refreshUsers();
+  }, []);
+  async function refreshUsers() {
+    try {
+      const userList = await window.api.listUsers();
+      setUsers(userList || []);
+    } catch (error) {
+      setStatus({ type: "error", text: error.message || "Failed to load users" });
+    }
+  }
+  function resetUserForm() {
+    setUserForm({
+      name: "",
+      password: "",
+      role: "pos"
+    });
+    setEditingUserId(null);
+  }
+  function updateUserField(field, value) {
+    setUserForm((prev) => ({ ...prev, [field]: value }));
+  }
+  async function handleUserSubmit(event) {
+    event.preventDefault();
+    if (!userForm.name.trim()) {
+      setStatus({ type: "error", text: "User name is required" });
+      return;
+    }
+    if (!editingUserId && !userForm.password.trim()) {
+      setStatus({ type: "error", text: "Password is required for new users" });
+      return;
+    }
+    try {
+      const payload = {
+        name: userForm.name.trim(),
+        role: userForm.role
+      };
+      if (!editingUserId) {
+        payload.password = userForm.password;
+      }
+      if (editingUserId) {
+        await window.api.updateUser({ ...payload, id: editingUserId });
+        setStatus({ type: "success", text: "User updated successfully" });
+      } else {
+        await window.api.createUser(payload);
+        setStatus({ type: "success", text: "User created successfully" });
+      }
+      await refreshUsers();
+      resetUserForm();
+    } catch (error) {
+      setStatus({ type: "error", text: error.message || "Failed to save user" });
+    }
+  }
+  function handleUserEdit(user) {
+    setUserForm({
+      name: user.name || "",
+      password: "",
+      role: user.role || "pos"
+    });
+    setEditingUserId(user.id);
+  }
+  async function handleUserDelete(id) {
+    if (!window.confirm("Are you sure you want to delete this user?"))
+      return;
+    try {
+      await window.api.deleteUser(id);
+      await refreshUsers();
+      setStatus({ type: "success", text: "User deleted successfully" });
+      if (editingUserId === id) {
+        resetUserForm();
+      }
+    } catch (error) {
+      setStatus({ type: "error", text: error.message || "Failed to delete user" });
+    }
+  }
+  return /* @__PURE__ */ import_react11.default.createElement("section", { className: "user-management-section" }, /* @__PURE__ */ import_react11.default.createElement("h2", null, "User Management"), status && /* @__PURE__ */ import_react11.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react11.default.createElement("form", { className: "form-grid", onSubmit: handleUserSubmit }, /* @__PURE__ */ import_react11.default.createElement("label", null, "User Name", /* @__PURE__ */ import_react11.default.createElement(
+    "input",
+    {
+      required: true,
+      value: userForm.name,
+      onChange: (e) => updateUserField("name", e.target.value),
+      placeholder: "Enter user name"
+    }
+  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Role", /* @__PURE__ */ import_react11.default.createElement(
+    "select",
+    {
+      value: userForm.role,
+      onChange: (e) => updateUserField("role", e.target.value)
+    },
+    /* @__PURE__ */ import_react11.default.createElement("option", { value: "pos" }, "POS User"),
+    /* @__PURE__ */ import_react11.default.createElement("option", { value: "admin" }, "Admin")
+  )), !editingUserId && /* @__PURE__ */ import_react11.default.createElement("label", null, "Password", /* @__PURE__ */ import_react11.default.createElement(
+    "input",
+    {
+      type: "password",
+      required: true,
+      value: userForm.password,
+      onChange: (e) => updateUserField("password", e.target.value),
+      placeholder: "Enter password"
+    }
+  )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "submit" }, editingUserId ? "Update User" : "Add User"), editingUserId && /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", className: "secondary", onClick: resetUserForm }, "Cancel Edit"))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react11.default.createElement("table", null, /* @__PURE__ */ import_react11.default.createElement("thead", null, /* @__PURE__ */ import_react11.default.createElement("tr", null, /* @__PURE__ */ import_react11.default.createElement("th", null, "Name"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Role"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react11.default.createElement("tbody", null, users.map((user) => /* @__PURE__ */ import_react11.default.createElement("tr", { key: user.id }, /* @__PURE__ */ import_react11.default.createElement("td", null, user.name), /* @__PURE__ */ import_react11.default.createElement("td", null, /* @__PURE__ */ import_react11.default.createElement("span", { className: `badge ${user.role === "admin" ? "admin" : "user"}` }, user.role === "admin" ? "Admin" : "POS")), /* @__PURE__ */ import_react11.default.createElement("td", null, /* @__PURE__ */ import_react11.default.createElement("div", { className: "action-buttons" }, /* @__PURE__ */ import_react11.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleUserEdit(user),
+      className: "edit-btn"
+    },
+    "Edit"
+  ), /* @__PURE__ */ import_react11.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleUserDelete(user.id),
+      className: "delete-btn"
+    },
+    "Delete"
+  ))))), !users.length && /* @__PURE__ */ import_react11.default.createElement("tr", null, /* @__PURE__ */ import_react11.default.createElement("td", { colSpan: 3, className: "empty" }, "No users found. Add your first user above."))))));
 }
 
 // src/renderer/admin/components/GSTConfigurationSection.jsx
