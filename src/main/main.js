@@ -10,6 +10,8 @@ const {
   getUser,
   getUserByName,
   updateUserByName,
+  getGSTSettings,
+  updateGSTSettings,
   getCompany,
   saveCompany,
   listCustomers,
@@ -65,6 +67,10 @@ function registerIpcHandlers() {
   ipcMain.handle('db:updateUser', (_, payload) => updateUser(payload.id, payload));
   ipcMain.handle('db:deleteUser', (_, id) => deleteUser(id));
   ipcMain.handle('db:updateUserProfile', (_, payload) => updateUserByName(payload.currentName, payload));
+
+  // GST configuration
+  ipcMain.handle('db:getGSTSettings', () => getGSTSettings());
+  ipcMain.handle('db:updateGSTSettings', (_, payload) => updateGSTSettings(payload));
 
   ipcMain.handle('db:getCompany', () => getCompany());
   ipcMain.handle('db:saveCompany', (_, payload) => saveCompany(payload));

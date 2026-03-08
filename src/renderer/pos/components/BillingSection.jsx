@@ -10,6 +10,7 @@ export function BillingSection({
   invoiceNotes,
   invoiceSummary,
   items,
+  gstSettings,
   onDateChange,
   onCustomerChange,
   onAddItem,
@@ -49,11 +50,10 @@ export function BillingSection({
           <table className="invoice-table">
             <thead>
               <tr>
-                <th style={{ width: '25%' }}>Item</th>
-                <th>Description</th>
-                <th style={{ width: '10%' }}>Qty</th>
-                <th style={{ width: '10%' }}>Rate</th>
-                <th style={{ width: '10%' }}>Amount</th>
+                <th style={{ width: '35%' }}>Item</th>
+                <th style={{ width: '15%' }}>Qty</th>
+                <th style={{ width: '15%' }}>Rate</th>
+                <th style={{ width: '15%' }}>Amount</th>
                 <th style={{ width: '10%' }}>Actions</th>
               </tr>
             </thead>
@@ -73,12 +73,6 @@ export function BillingSection({
                         </option>
                       ))}
                     </select>
-                  </td>
-                  <td>
-                    <input
-                      value={row.description}
-                      onChange={(e) => onItemChange(row.id, 'description', e.target.value)}
-                    />
                   </td>
                   <td>
                     <input
@@ -110,7 +104,7 @@ export function BillingSection({
               ))}
               {!invoiceItems.length && (
                 <tr>
-                  <td colSpan={6} className="empty">
+                  <td colSpan={5} className="empty">
                     Add items to start billing.
                   </td>
                 </tr>
@@ -143,11 +137,11 @@ export function BillingSection({
               <strong>{formatCurrency(invoiceSummary.subtotal)}</strong>
             </div>
             <div>
-              <span>CGST 2.5%</span>
+              <span>CGST {gstSettings.enabled ? (invoiceSummary.cgstRate || 2.5) : 0}%</span>
               <strong>{formatCurrency(invoiceSummary.cgst)}</strong>
             </div>
             <div>
-              <span>SGST 2.5%</span>
+              <span>SGST {gstSettings.enabled ? (invoiceSummary.sgstRate || 2.5) : 0}%</span>
               <strong>{formatCurrency(invoiceSummary.sgst)}</strong>
             </div>
             <div className="total">

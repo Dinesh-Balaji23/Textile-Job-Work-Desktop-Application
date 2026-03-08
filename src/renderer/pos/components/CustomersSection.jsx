@@ -74,12 +74,22 @@ export function CustomersSection({
                 <td>{customer.state || '-'}</td>
                 <td>{customer.state_code || '-'}</td>
                 <td>
-                  <button type="button" onClick={() => onEdit(customer)}>
-                    Edit
-                  </button>
-                  <button type="button" className="danger" onClick={() => onDelete(customer.id)}>
-                    Delete
-                  </button>
+                  <div className="action-buttons">
+                    <button 
+                      type="button" 
+                      onClick={() => onEdit(customer)}
+                      className="edit-btn"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => onDelete(customer.id)}
+                      className="delete-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

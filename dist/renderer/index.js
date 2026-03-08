@@ -1083,7 +1083,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState6(initialState) {
+        function useState7(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1095,7 +1095,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect5(create, deps) {
+        function useEffect6(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1878,7 +1878,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect5;
+        exports.useEffect = useEffect6;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -1886,7 +1886,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo2;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState6;
+        exports.useState = useState7;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -23684,7 +23684,23 @@ function CustomersSection({
       value: form.address,
       onChange: (e) => onFieldChange("address", e.target.value)
     }
-  )), /* @__PURE__ */ import_react4.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react4.default.createElement("button", { type: "submit" }, editingCustomerId ? "Update" : "Add", " Customer"), editingCustomerId && /* @__PURE__ */ import_react4.default.createElement("button", { type: "button", className: "secondary", onClick: onCancelEdit }, "Cancel Edit"))), /* @__PURE__ */ import_react4.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react4.default.createElement("table", null, /* @__PURE__ */ import_react4.default.createElement("thead", null, /* @__PURE__ */ import_react4.default.createElement("tr", null, /* @__PURE__ */ import_react4.default.createElement("th", null, "Name"), /* @__PURE__ */ import_react4.default.createElement("th", null, "GSTIN"), /* @__PURE__ */ import_react4.default.createElement("th", null, "State"), /* @__PURE__ */ import_react4.default.createElement("th", null, "State Code"), /* @__PURE__ */ import_react4.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react4.default.createElement("tbody", null, customers.map((customer) => /* @__PURE__ */ import_react4.default.createElement("tr", { key: customer.id }, /* @__PURE__ */ import_react4.default.createElement("td", null, customer.name), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.gstin || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.state || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.state_code || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, /* @__PURE__ */ import_react4.default.createElement("button", { type: "button", onClick: () => onEdit(customer) }, "Edit"), /* @__PURE__ */ import_react4.default.createElement("button", { type: "button", className: "danger", onClick: () => onDelete(customer.id) }, "Delete")))), !customers.length && /* @__PURE__ */ import_react4.default.createElement("tr", null, /* @__PURE__ */ import_react4.default.createElement("td", { colSpan: 5, className: "empty" }, "No customers added yet."))))));
+  )), /* @__PURE__ */ import_react4.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react4.default.createElement("button", { type: "submit" }, editingCustomerId ? "Update" : "Add", " Customer"), editingCustomerId && /* @__PURE__ */ import_react4.default.createElement("button", { type: "button", className: "secondary", onClick: onCancelEdit }, "Cancel Edit"))), /* @__PURE__ */ import_react4.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react4.default.createElement("table", null, /* @__PURE__ */ import_react4.default.createElement("thead", null, /* @__PURE__ */ import_react4.default.createElement("tr", null, /* @__PURE__ */ import_react4.default.createElement("th", null, "Name"), /* @__PURE__ */ import_react4.default.createElement("th", null, "GSTIN"), /* @__PURE__ */ import_react4.default.createElement("th", null, "State"), /* @__PURE__ */ import_react4.default.createElement("th", null, "State Code"), /* @__PURE__ */ import_react4.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react4.default.createElement("tbody", null, customers.map((customer) => /* @__PURE__ */ import_react4.default.createElement("tr", { key: customer.id }, /* @__PURE__ */ import_react4.default.createElement("td", null, customer.name), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.gstin || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.state || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.state_code || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, /* @__PURE__ */ import_react4.default.createElement("div", { className: "action-buttons" }, /* @__PURE__ */ import_react4.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => onEdit(customer),
+      className: "edit-btn"
+    },
+    "Edit"
+  ), /* @__PURE__ */ import_react4.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => onDelete(customer.id),
+      className: "delete-btn"
+    },
+    "Delete"
+  ))))), !customers.length && /* @__PURE__ */ import_react4.default.createElement("tr", null, /* @__PURE__ */ import_react4.default.createElement("td", { colSpan: 5, className: "empty" }, "No customers added yet."))))));
 }
 
 // src/renderer/pos/components/BillingSection.jsx
@@ -23707,6 +23723,7 @@ function BillingSection({
   invoiceNotes,
   invoiceSummary,
   items,
+  gstSettings,
   onDateChange,
   onCustomerChange,
   onAddItem,
@@ -23715,7 +23732,7 @@ function BillingSection({
   onNotesChange,
   onSubmit
 }) {
-  return /* @__PURE__ */ import_react5.default.createElement("section", null, /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-header" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("h2", null, "Create Invoice"), /* @__PURE__ */ import_react5.default.createElement("p", null, "Invoice No. ", nextInvoiceNumber))), /* @__PURE__ */ import_react5.default.createElement("form", { onSubmit }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-meta" }, /* @__PURE__ */ import_react5.default.createElement("label", null, "Invoice Date", /* @__PURE__ */ import_react5.default.createElement("input", { type: "date", value: invoiceDate, onChange: (e) => onDateChange(e.target.value) })), /* @__PURE__ */ import_react5.default.createElement("label", null, "Customer", /* @__PURE__ */ import_react5.default.createElement("select", { value: invoiceCustomerId, onChange: (e) => onCustomerChange(e.target.value), required: true }, /* @__PURE__ */ import_react5.default.createElement("option", { value: "" }, "Select customer"), customers.map((customer) => /* @__PURE__ */ import_react5.default.createElement("option", { key: customer.id, value: customer.id }, customer.name))))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react5.default.createElement("table", { className: "invoice-table" }, /* @__PURE__ */ import_react5.default.createElement("thead", null, /* @__PURE__ */ import_react5.default.createElement("tr", null, /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "25%" } }, "Item"), /* @__PURE__ */ import_react5.default.createElement("th", null, "Description"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "10%" } }, "Qty"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "10%" } }, "Rate"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "10%" } }, "Amount"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "10%" } }, "Actions"))), /* @__PURE__ */ import_react5.default.createElement("tbody", null, invoiceItems.map((row) => /* @__PURE__ */ import_react5.default.createElement("tr", { key: row.id }, /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement("section", null, /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-header" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("h2", null, "Create Invoice"), /* @__PURE__ */ import_react5.default.createElement("p", null, "Invoice No. ", nextInvoiceNumber))), /* @__PURE__ */ import_react5.default.createElement("form", { onSubmit }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-meta" }, /* @__PURE__ */ import_react5.default.createElement("label", null, "Invoice Date", /* @__PURE__ */ import_react5.default.createElement("input", { type: "date", value: invoiceDate, onChange: (e) => onDateChange(e.target.value) })), /* @__PURE__ */ import_react5.default.createElement("label", null, "Customer", /* @__PURE__ */ import_react5.default.createElement("select", { value: invoiceCustomerId, onChange: (e) => onCustomerChange(e.target.value), required: true }, /* @__PURE__ */ import_react5.default.createElement("option", { value: "" }, "Select customer"), customers.map((customer) => /* @__PURE__ */ import_react5.default.createElement("option", { key: customer.id, value: customer.id }, customer.name))))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react5.default.createElement("table", { className: "invoice-table" }, /* @__PURE__ */ import_react5.default.createElement("thead", null, /* @__PURE__ */ import_react5.default.createElement("tr", null, /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "35%" } }, "Item"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "15%" } }, "Qty"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "15%" } }, "Rate"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "15%" } }, "Amount"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "10%" } }, "Actions"))), /* @__PURE__ */ import_react5.default.createElement("tbody", null, invoiceItems.map((row) => /* @__PURE__ */ import_react5.default.createElement("tr", { key: row.id }, /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement(
     "select",
     {
       value: row.item_id,
@@ -23724,12 +23741,6 @@ function BillingSection({
     },
     /* @__PURE__ */ import_react5.default.createElement("option", { value: "" }, "Select item"),
     items.map((item) => /* @__PURE__ */ import_react5.default.createElement("option", { key: item.id, value: item.id }, item.name))
-  )), /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement(
-    "input",
-    {
-      value: row.description,
-      onChange: (e) => onItemChange(row.id, "description", e.target.value)
-    }
   )), /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement(
     "input",
     {
@@ -23750,7 +23761,7 @@ function BillingSection({
       onChange: (e) => onItemChange(row.id, "rate", e.target.value),
       required: true
     }
-  )), /* @__PURE__ */ import_react5.default.createElement("td", null, formatCurrency(row.amount || 0)), /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement("button", { type: "button", className: "danger", onClick: () => onRemoveItem(row.id) }, "Remove")))), !invoiceItems.length && /* @__PURE__ */ import_react5.default.createElement("tr", null, /* @__PURE__ */ import_react5.default.createElement("td", { colSpan: 6, className: "empty" }, "Add items to start billing."))))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-actions" }, /* @__PURE__ */ import_react5.default.createElement("button", { type: "button", onClick: onAddItem }, "+ Add Item")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-summary" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("label", null, "Notes", /* @__PURE__ */ import_react5.default.createElement(
+  )), /* @__PURE__ */ import_react5.default.createElement("td", null, formatCurrency(row.amount || 0)), /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement("button", { type: "button", className: "danger", onClick: () => onRemoveItem(row.id) }, "Remove")))), !invoiceItems.length && /* @__PURE__ */ import_react5.default.createElement("tr", null, /* @__PURE__ */ import_react5.default.createElement("td", { colSpan: 5, className: "empty" }, "Add items to start billing."))))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-actions" }, /* @__PURE__ */ import_react5.default.createElement("button", { type: "button", onClick: onAddItem }, "+ Add Item")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-summary" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("label", null, "Notes", /* @__PURE__ */ import_react5.default.createElement(
     "textarea",
     {
       rows: 3,
@@ -23758,7 +23769,7 @@ function BillingSection({
       onChange: (e) => onNotesChange(e.target.value),
       placeholder: "Optional notes"
     }
-  ))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "summary-box" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "Subtotal"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.subtotal))), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "CGST 2.5%"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.cgst))), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "SGST 2.5%"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.sgst))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "total" }, /* @__PURE__ */ import_react5.default.createElement("span", null, "Total"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.total))), /* @__PURE__ */ import_react5.default.createElement("button", { type: "submit" }, "Save Invoice")))));
+  ))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "summary-box" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "Subtotal"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.subtotal))), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "CGST ", gstSettings.enabled ? invoiceSummary.cgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.cgst))), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "SGST ", gstSettings.enabled ? invoiceSummary.sgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.sgst))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "total" }, /* @__PURE__ */ import_react5.default.createElement("span", null, "Total"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.total))), /* @__PURE__ */ import_react5.default.createElement("button", { type: "submit" }, "Save Invoice")))));
 }
 
 // src/renderer/pos/components/InvoicesSection.jsx
@@ -24024,7 +24035,117 @@ function UserManagementSection() {
 // src/renderer/admin/components/GSTConfigurationSection.jsx
 var import_react13 = __toESM(require_react());
 function GSTConfigurationSection() {
-  return /* @__PURE__ */ import_react13.default.createElement("section", null, /* @__PURE__ */ import_react13.default.createElement("h2", null, "GST Configuration"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "placeholder" }, /* @__PURE__ */ import_react13.default.createElement("p", null, "GST configuration functionality coming soon."), /* @__PURE__ */ import_react13.default.createElement("p", null, "This will include:"), /* @__PURE__ */ import_react13.default.createElement("ul", null, /* @__PURE__ */ import_react13.default.createElement("li", null, "GST rates configuration"), /* @__PURE__ */ import_react13.default.createElement("li", null, "HSN code management"), /* @__PURE__ */ import_react13.default.createElement("li", null, "Tax calculation rules"), /* @__PURE__ */ import_react13.default.createElement("li", null, "GST report settings"))));
+  const [gstSettings, setGSTSettings] = (0, import_react13.useState)({
+    cgst_percent: 2.5,
+    sgst_percent: 2.5,
+    enabled: true
+  });
+  const [form, setForm] = (0, import_react13.useState)({
+    cgst_percent: "",
+    sgst_percent: "",
+    enabled: true
+  });
+  const [status, setStatus] = (0, import_react13.useState)(null);
+  const [isEditing, setIsEditing] = (0, import_react13.useState)(false);
+  (0, import_react13.useEffect)(() => {
+    loadGSTSettings();
+  }, []);
+  async function loadGSTSettings() {
+    try {
+      const settings = await window.api.getGSTSettings();
+      if (settings) {
+        setGSTSettings(settings);
+        setForm({
+          cgst_percent: settings.cgst_percent.toString(),
+          sgst_percent: settings.sgst_percent.toString(),
+          enabled: settings.enabled
+        });
+      }
+    } catch (error) {
+      setStatus({ type: "error", text: error.message || "Failed to load GST settings" });
+    }
+  }
+  function updateFormField(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+  function handleEditToggle() {
+    setIsEditing(!isEditing);
+    setStatus(null);
+  }
+  async function handleGSTSubmit(event) {
+    event.preventDefault();
+    const cgstPercent = parseFloat(form.cgst_percent);
+    const sgstPercent = parseFloat(form.sgst_percent);
+    if (isNaN(cgstPercent) || isNaN(sgstPercent)) {
+      setStatus({ type: "error", text: "Invalid GST rates. Please enter valid numbers." });
+      return;
+    }
+    if (cgstPercent < 0 || cgstPercent > 100 || sgstPercent < 0 || sgstPercent > 100) {
+      setStatus({ type: "error", text: "GST rates must be between 0% and 100%" });
+      return;
+    }
+    try {
+      const updatedSettings = await window.api.updateGSTSettings({
+        cgst_percent: cgstPercent,
+        sgst_percent: sgstPercent,
+        enabled: form.enabled
+      });
+      setGSTSettings(updatedSettings);
+      setStatus({ type: "success", text: "GST settings updated successfully!" });
+      setIsEditing(false);
+    } catch (error) {
+      setStatus({ type: "error", text: error.message || "Failed to update GST settings" });
+    }
+  }
+  function calculateTotalGST() {
+    return (gstSettings.cgst_percent || 0) + (gstSettings.sgst_percent || 0);
+  }
+  return /* @__PURE__ */ import_react13.default.createElement("section", null, /* @__PURE__ */ import_react13.default.createElement("h2", null, "GST Configuration"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "gst-info" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-card" }, /* @__PURE__ */ import_react13.default.createElement("h3", null, "Current GST Settings"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "Status:"), /* @__PURE__ */ import_react13.default.createElement("span", { className: `badge ${gstSettings.enabled ? "enabled" : "disabled"}` }, gstSettings.enabled ? "Enabled" : "Disabled")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "CGST Rate:"), /* @__PURE__ */ import_react13.default.createElement("span", null, (gstSettings.cgst_percent || 0).toFixed(2), "%")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "SGST Rate:"), /* @__PURE__ */ import_react13.default.createElement("span", null, (gstSettings.sgst_percent || 0).toFixed(2), "%")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "Total GST:"), /* @__PURE__ */ import_react13.default.createElement("span", { className: "total-gst" }, calculateTotalGST().toFixed(2), "%")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "Last Updated:"), /* @__PURE__ */ import_react13.default.createElement("span", null, gstSettings.updated_at ? new Date(gstSettings.updated_at).toLocaleString() : "Never")))), status && /* @__PURE__ */ import_react13.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react13.default.createElement("div", { className: "gst-edit" }, !isEditing ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "edit-actions" }, /* @__PURE__ */ import_react13.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleEditToggle,
+      className: "primary"
+    },
+    "Edit GST Settings"
+  )) : /* @__PURE__ */ import_react13.default.createElement("form", { className: "form-grid", onSubmit: handleGSTSubmit }, /* @__PURE__ */ import_react13.default.createElement("label", null, "CGST Rate (%)", /* @__PURE__ */ import_react13.default.createElement(
+    "input",
+    {
+      type: "number",
+      step: "0.01",
+      min: "0",
+      max: "100",
+      value: form.cgst_percent,
+      onChange: (e) => updateFormField("cgst_percent", e.target.value),
+      placeholder: "Enter CGST rate as percentage"
+    }
+  )), /* @__PURE__ */ import_react13.default.createElement("label", null, "SGST Rate (%)", /* @__PURE__ */ import_react13.default.createElement(
+    "input",
+    {
+      type: "number",
+      step: "0.01",
+      min: "0",
+      max: "100",
+      value: form.sgst_percent,
+      onChange: (e) => updateFormField("sgst_percent", e.target.value),
+      placeholder: "Enter SGST rate as percentage"
+    }
+  )), /* @__PURE__ */ import_react13.default.createElement("label", { className: "checkbox-label" }, /* @__PURE__ */ import_react13.default.createElement(
+    "input",
+    {
+      type: "checkbox",
+      checked: form.enabled,
+      onChange: (e) => updateFormField("enabled", e.target.checked)
+    }
+  ), "Enable GST Calculations"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react13.default.createElement("button", { type: "submit" }, "Update GST Settings"), /* @__PURE__ */ import_react13.default.createElement(
+    "button",
+    {
+      type: "button",
+      className: "secondary",
+      onClick: handleEditToggle
+    },
+    "Cancel"
+  )))));
 }
 
 // src/renderer/admin/components/ReportingSection.jsx
@@ -24095,13 +24216,29 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
   (0, import_react16.useEffect)(() => {
     refreshAll();
   }, []);
+  const [gstSettings, setGSTSettings] = (0, import_react16.useState)({
+    cgst_percent: 2.5,
+    sgst_percent: 2.5,
+    enabled: true
+  });
   const invoiceSummary = (0, import_react16.useMemo)(() => {
     const subtotal = invoiceItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-    const cgst = +(subtotal * 0.025).toFixed(2);
-    const sgst = +(subtotal * 0.025).toFixed(2);
+    let cgst = 0;
+    let sgst = 0;
+    if (gstSettings.enabled) {
+      cgst = +(subtotal * (gstSettings.cgst_percent / 100)).toFixed(2);
+      sgst = +(subtotal * (gstSettings.sgst_percent / 100)).toFixed(2);
+    }
     const total = +(subtotal + cgst + sgst).toFixed(2);
-    return { subtotal, cgst, sgst, total };
-  }, [invoiceItems]);
+    return {
+      subtotal,
+      cgst,
+      sgst,
+      total,
+      cgstRate: gstSettings.cgst_percent,
+      sgstRate: gstSettings.sgst_percent
+    };
+  }, [invoiceItems, gstSettings]);
   async function refreshAll() {
     try {
       const [customerList, itemList, invoiceList, upcomingNo] = await Promise.all([
@@ -24115,6 +24252,18 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
       setItems(itemList || []);
       setInvoices(invoiceList || []);
       setNextInvoiceNumber(upcomingNo || 1);
+      try {
+        const settings = await window.api.getGSTSettings();
+        if (settings) {
+          setGSTSettings({
+            cgst_percent: settings.cgst_percent || 2.5,
+            sgst_percent: settings.sgst_percent || 2.5,
+            enabled: settings.enabled === 1 || settings.enabled === true
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load GST settings:", error);
+      }
       if (!invoiceCustomerId && customersData.length) {
         setInvoiceCustomerId(customersData[0].id.toString());
       }
@@ -24297,6 +24446,7 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
       invoiceNotes,
       invoiceSummary,
       items,
+      gstSettings,
       onDateChange: setInvoiceDate,
       onCustomerChange: setInvoiceCustomerId,
       onAddItem: addInvoiceItem,

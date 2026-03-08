@@ -595,3 +595,83 @@ td.empty {
   transform: translateY(-2px);
   box-shadow: 0 16px 32px rgba(0, 109, 119, 0.3);
 }
+
+/* GST Configuration Styling */
+.gst-info {
+  margin-bottom: 24px;
+}
+
+.gst-edit {
+  background: white;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+}
+
+.gst-info .info-card h3 {
+  margin: 0 0 16px 0;
+  color: var(--brand-primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.gst-info .info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.gst-info .info-item:last-child {
+  border-bottom: none;
+}
+
+.gst-info .info-item label {
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-right: 12px;
+}
+
+.gst-info .info-item span {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.gst-info .badge.enabled {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.gst-info .badge.disabled {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.total-gst {
+  font-size: 18px;
+  color: var(--brand-primary);
+  font-weight: 700;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}

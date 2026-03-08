@@ -94,14 +94,35 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
     refreshAll();
   }, []);
 
-  const invoiceSummary = useMemo(() => {
-    const subtotal = invoiceItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-    const cgst = +(subtotal * 0.025).toFixed(2);
-    const sgst = +(subtotal * 0.025).toFixed(2);
-    const total = +(subtotal + cgst + sgst).toFixed(2);
-    return { subtotal, cgst, sgst, total };
-  }, [invoiceItems]);
+  const [gstSettings, setGSTSettings] = useState({
+  cgst_percent: 2.5,
+  sgst_percent: 2.5,
+  enabled: true
+});
 
+const invoiceSummary = useMemo(() => {
+    const subtotal = invoiceItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+    
+    // Only apply GST if enabled
+    let cgst = 0;
+    let sgst = 0;
+    
+    if (gstSettings.enabled) {
+      cgst = +(subtotal * (gstSettings.cgst_percent / 100)).toFixed(2);
+      sgst = +(subtotal * (gstSettings.sgst_percent / 100)).toFixed(2);
+    }
+    
+    const total = +(subtotal + cgst + sgst).toFixed(2);
+
+    return {
+      subtotal,
+      cgst,
+      sgst,
+      total,
+      cgstRate: gstSettings.cgst_percent,
+      sgstRate: gstSettings.sgst_percent
+    };
+  }, [invoiceItems, gstSettings]);
 
   async function refreshAll() {
     try {
@@ -117,6 +138,20 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
       setItems(itemList || []);
       setInvoices(invoiceList || []);
       setNextInvoiceNumber(upcomingNo || 1);
+
+      // Load GST settings
+      try {
+        const settings = await window.api.getGSTSettings();
+        if (settings) {
+          setGSTSettings({
+            cgst_percent: settings.cgst_percent || 2.5,
+            sgst_percent: settings.sgst_percent || 2.5,
+            enabled: settings.enabled === 1 || settings.enabled === true
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load GST settings:', error);
+      }
 
       if (!invoiceCustomerId && customersData.length) {
         setInvoiceCustomerId(customersData[0].id.toString());
@@ -331,6 +366,7 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
             invoiceNotes={invoiceNotes}
             invoiceSummary={invoiceSummary}
             items={items}
+            gstSettings={gstSettings}
             onDateChange={setInvoiceDate}
             onCustomerChange={setInvoiceCustomerId}
             onAddItem={addInvoiceItem}

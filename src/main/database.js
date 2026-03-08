@@ -50,6 +50,14 @@ function createTables(db) {
       phone TEXT
     );
 
+    CREATE TABLE IF NOT EXISTS gst_settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      cgst_rate REAL NOT NULL DEFAULT 0.025,
+      sgst_rate REAL NOT NULL DEFAULT 0.025,
+      enabled BOOLEAN NOT NULL DEFAULT 1,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS customers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -94,6 +102,7 @@ function createTables(db) {
   `);
 
   seedDefaultUsers(db);
+  seedDefaultGSTSettings(db);
 }
 
 function seedDefaultUsers(db) {
@@ -115,6 +124,19 @@ function seedDefaultUsers(db) {
       user
     );
   });
+}
+
+function seedDefaultGSTSettings(db) {
+  const existing = queryOne(db, 'SELECT COUNT(*) as count FROM gst_settings');
+  if (existing?.count) {
+    return;
+  }
+
+  run(
+    db,
+    `INSERT INTO gst_settings (id, cgst_percent, sgst_percent, enabled, updated_at)
+     VALUES (1, 2.5, 2.5, 1, datetime('now'))`
+  );
 }
 
 async function persist() {
@@ -275,6 +297,91 @@ async function updateUserByName(name, updates) {
 async function getUserByName(name) {
   const db = await getDb();
   return queryOne(db, 'SELECT id, name, role FROM users WHERE name = :name', { name });
+}
+
+async function getGSTSettings() {
+  const db = await getDb();
+  
+  // First try to get settings to see if table exists and has the right structure
+  try {
+    console.log('Getting GST settings from database...');
+    const settings = queryOne(db, 'SELECT * FROM gst_settings WHERE id = 1');
+    console.log('GST settings query result:', settings);
+    console.log('Settings enabled type:', typeof settings?.enabled);
+    console.log('Settings cgst_percent:', settings?.cgst_percent);
+    console.log('Settings sgst_percent:', settings?.sgst_percent);
+    
+    if (settings && (settings.enabled === 1 || settings.enabled === 0 || settings.enabled === true || settings.enabled === false)) {
+      // Table exists and has enabled column, return settings
+      console.log('Returning existing GST settings');
+      return settings;
+    }
+  } catch (error) {
+    console.log('Error getting GST settings:', error);
+    // Table doesn't exist or has wrong structure, create it fresh
+  }
+  
+  // Drop and recreate table to ensure proper structure
+  console.log('Recreating GST settings table...');
+  run(db, 'DROP TABLE IF EXISTS gst_settings');
+  
+  run(db, `
+    CREATE TABLE gst_settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      cgst_percent REAL NOT NULL DEFAULT 2.5,
+      sgst_percent REAL NOT NULL DEFAULT 2.5,
+      enabled BOOLEAN NOT NULL DEFAULT 1,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  
+  // Insert default settings
+  run(
+    db,
+    `INSERT INTO gst_settings (id, cgst_percent, sgst_percent, enabled, updated_at)
+     VALUES (1, 2.5, 2.5, 1, datetime('now'))`
+  );
+  
+  await persist();
+  
+  // Try to get settings again
+  console.log('Getting GST settings after recreation...');
+  const newSettings = queryOne(db, 'SELECT * FROM gst_settings WHERE id = 1');
+  console.log('New GST settings:', newSettings);
+  return newSettings;
+}
+
+async function updateGSTSettings(settings) {
+  const db = await getDb();
+  const updates = [];
+  const params = { id: 1 };
+  
+  if (settings.cgst_percent !== undefined) {
+    updates.push('cgst_percent = :cgst_percent');
+    params.cgst_percent = settings.cgst_percent;
+  }
+  
+  if (settings.sgst_percent !== undefined) {
+    updates.push('sgst_percent = :sgst_percent');
+    params.sgst_percent = settings.sgst_percent;
+  }
+  
+  if (settings.enabled !== undefined) {
+    updates.push('enabled = :enabled');
+    params.enabled = settings.enabled;
+  }
+  
+  if (updates.length === 0) {
+    throw new Error('No fields to update');
+  }
+  
+  run(
+    db,
+    `UPDATE gst_settings SET ${updates.join(', ')}, updated_at = datetime('now') WHERE id = :id`,
+    params
+  );
+  await persist();
+  return getGSTSettings();
 }
 
 async function saveCompany(payload) {
@@ -453,12 +560,25 @@ async function createInvoice(payload) {
     throw new Error('Invoice requires at least one item');
   }
 
+  // Get GST settings for calculations
+  const gstSettings = await getGSTSettings();
+  const cgstRate = (gstSettings?.cgst_percent || 2.5) / 100;
+  const sgstRate = (gstSettings?.sgst_percent || 2.5) / 100;
+  const gstEnabled = gstSettings?.enabled !== false;
+
   db.exec('BEGIN TRANSACTION;');
   try {
     const invoiceNumber = computeNextInvoiceNumber(db);
     const subtotal = items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const cgst = +(subtotal * 0.025).toFixed(2);
-    const sgst = +(subtotal * 0.025).toFixed(2);
+    
+    let cgst = 0;
+    let sgst = 0;
+    
+    if (gstEnabled) {
+      cgst = +(subtotal * cgstRate).toFixed(2);
+      sgst = +(subtotal * sgstRate).toFixed(2);
+    }
+    
     const total = +(subtotal + cgst + sgst).toFixed(2);
 
     run(
@@ -483,9 +603,9 @@ async function createInvoice(payload) {
         invoice_id: invoiceId,
         item_id: Number(item.item_id),
         description: item.description || '',
-        quantity: Number(item.quantity) || 0,
-        rate: Number(item.rate) || 0,
-        amount: Number(item.amount) || 0
+        quantity: parseFloat(item.quantity) || 0,
+        rate: parseFloat(item.rate) || 0,
+        amount: parseFloat(item.amount) || 0
       };
 
       run(
@@ -526,6 +646,8 @@ module.exports = {
   getUser,
   getUserByName,
   updateUserByName,
+  getGSTSettings,
+  updateGSTSettings,
   getCompany,
   saveCompany,
   listCustomers,
