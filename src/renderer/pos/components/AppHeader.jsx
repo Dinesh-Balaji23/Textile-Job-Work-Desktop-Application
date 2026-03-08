@@ -1,6 +1,7 @@
 import React from 'react';
+import { StockNotification } from '../../components/StockNotification';
 
-export function AppHeader({ onLogout, user, company }) {
+export function AppHeader({ onLogout, user, company, items }) {
   const name = company?.name?.trim() || 'Textile Job Work POS';
   const location = company?.address?.trim() || 'Location pending';
 
@@ -13,6 +14,7 @@ export function AppHeader({ onLogout, user, company }) {
       </div>
       {user && (
         <div className="header-actions">
+          <StockNotification items={items} />
           <span className="badge">
             {user.role === 'admin' ? 'ADMIN' : 'POS'} - {user.name?.toUpperCase()}
           </span>

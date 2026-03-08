@@ -228,9 +228,7 @@ export function InventorySection({
                 filteredItems.map((item) => (
                   <tr key={item.id} className="inventory-row">
                     <td className="item-name">{item.name}</td>
-                    <td className="item-category">
-                      <span className="category-badge">{item.category || 'Uncategorized'}</span>
-                    </td>
+                    <td className="item-category">{item.category || 'Uncategorized'}</td>
                     <td className="item-unit">{item.unit}</td>
                     <td className="item-quantity">
                       <span className={`quantity-badge ${item.quantity < 10 ? 'low-stock' : 'in-stock'}`}>

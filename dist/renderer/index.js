@@ -1090,7 +1090,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState8(initialState) {
+        function useState9(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1102,7 +1102,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect6(create2, deps) {
+        function useEffect7(create2, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create2, deps);
         }
@@ -1885,7 +1885,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect6;
+        exports.useEffect = useEffect7;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -1893,7 +1893,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo2;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState8;
+        exports.useState = useState9;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2389,9 +2389,9 @@ var require_react_dom_development = __commonJS({
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
         }
-        var React15 = require_react();
+        var React16 = require_react();
         var Scheduler = require_scheduler();
-        var ReactSharedInternals = React15.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React16.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         var suppressWarning = false;
         function setSuppressWarning(newSuppressWarning) {
           {
@@ -3996,7 +3996,7 @@ var require_react_dom_development = __commonJS({
           {
             if (props.value == null) {
               if (typeof props.children === "object" && props.children !== null) {
-                React15.Children.forEach(props.children, function(child) {
+                React16.Children.forEach(props.children, function(child) {
                   if (child == null) {
                     return;
                   }
@@ -43178,21 +43178,46 @@ var init_index_es = __esm({
 });
 
 // src/renderer/index.jsx
-var import_react16 = __toESM(require_react());
+var import_react17 = __toESM(require_react());
 var import_client = __toESM(require_client());
 
 // src/renderer/pos/components/AppHeader.jsx
+var import_react2 = __toESM(require_react());
+
+// src/renderer/components/StockNotification.jsx
 var import_react = __toESM(require_react());
-function AppHeader({ onLogout, user, company }) {
+function StockNotification({ items }) {
+  const [lowStockItems, setLowStockItems] = (0, import_react.useState)([]);
+  const [showDropdown, setShowDropdown] = (0, import_react.useState)(false);
+  const STOCK_THRESHOLD = 20;
+  (0, import_react.useEffect)(() => {
+    if (items && items.length > 0) {
+      const lowStock = items.filter((item) => item.quantity < STOCK_THRESHOLD);
+      setLowStockItems(lowStock);
+    }
+  }, [items]);
+  const notificationCount = lowStockItems.length;
+  return /* @__PURE__ */ import_react.default.createElement("div", { className: "stock-notification" }, /* @__PURE__ */ import_react.default.createElement(
+    "button",
+    {
+      className: "notification-btn",
+      onClick: () => setShowDropdown(!showDropdown)
+    },
+    /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-icon" }, /* @__PURE__ */ import_react.default.createElement("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round" }, /* @__PURE__ */ import_react.default.createElement("path", { d: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" }), /* @__PURE__ */ import_react.default.createElement("path", { d: "M13.73 21a2 2 0 0 1-3.46 0" })), notificationCount > 0 && /* @__PURE__ */ import_react.default.createElement("span", { className: "notification-badge" }, notificationCount))
+  ), showDropdown && /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-dropdown" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-header" }, /* @__PURE__ */ import_react.default.createElement("h4", null, "Low Stock Alerts"), /* @__PURE__ */ import_react.default.createElement("span", { className: "notification-count" }, notificationCount, " items")), /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-list" }, notificationCount > 0 ? lowStockItems.map((item) => /* @__PURE__ */ import_react.default.createElement("div", { key: item.id, className: "notification-item" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "item-info" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "item-name" }, item.name), /* @__PURE__ */ import_react.default.createElement("span", { className: "item-quantity" }, item.quantity, " ", item.unit)), /* @__PURE__ */ import_react.default.createElement("div", { className: "item-category" }, item.category || "Uncategorized"))) : /* @__PURE__ */ import_react.default.createElement("div", { className: "no-notifications" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "no-notifications-icon" }, "\u2713"), /* @__PURE__ */ import_react.default.createElement("p", null, "All items are well stocked")))));
+}
+
+// src/renderer/pos/components/AppHeader.jsx
+function AppHeader({ onLogout, user, company, items }) {
   const name = company?.name?.trim() || "Textile Job Work POS";
   const location2 = company?.address?.trim() || "Location pending";
-  return /* @__PURE__ */ import_react.default.createElement("header", { className: "app-header" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "logo-circle" }, name?.slice(0, 2)?.toUpperCase() || "TP"), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("p", { className: "subtitle" }, location2), /* @__PURE__ */ import_react.default.createElement("h1", null, name)), user && /* @__PURE__ */ import_react.default.createElement("div", { className: "header-actions" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "badge" }, user.role === "admin" ? "ADMIN" : "POS", " - ", user.name?.toUpperCase()), /* @__PURE__ */ import_react.default.createElement("button", { type: "button", className: "secondary", onClick: onLogout }, "Logout")));
+  return /* @__PURE__ */ import_react2.default.createElement("header", { className: "app-header" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "logo-circle" }, name?.slice(0, 2)?.toUpperCase() || "TP"), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("p", { className: "subtitle" }, location2), /* @__PURE__ */ import_react2.default.createElement("h1", null, name)), user && /* @__PURE__ */ import_react2.default.createElement("div", { className: "header-actions" }, /* @__PURE__ */ import_react2.default.createElement(StockNotification, { items }), /* @__PURE__ */ import_react2.default.createElement("span", { className: "badge" }, user.role === "admin" ? "ADMIN" : "POS", " - ", user.name?.toUpperCase()), /* @__PURE__ */ import_react2.default.createElement("button", { type: "button", className: "secondary", onClick: onLogout }, "Logout")));
 }
 
 // src/renderer/pos/components/TabBar.jsx
-var import_react2 = __toESM(require_react());
+var import_react3 = __toESM(require_react());
 function TabBar({ tabs, activeTab, onChange }) {
-  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "tabs" }, tabs.map((tab) => /* @__PURE__ */ import_react2.default.createElement(
+  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "tabs" }, tabs.map((tab) => /* @__PURE__ */ import_react3.default.createElement(
     "button",
     {
       key: tab.key,
@@ -43204,14 +43229,14 @@ function TabBar({ tabs, activeTab, onChange }) {
 }
 
 // src/renderer/pos/components/ProfileSection.jsx
-var import_react3 = __toESM(require_react());
+var import_react4 = __toESM(require_react());
 function ProfileSection({ user, onUserUpdate }) {
-  const [profileForm, setProfileForm] = (0, import_react3.useState)({
+  const [profileForm, setProfileForm] = (0, import_react4.useState)({
     name: ""
   });
-  const [status, setStatus] = (0, import_react3.useState)(null);
-  const [isEditing, setIsEditing] = (0, import_react3.useState)(false);
-  (0, import_react3.useEffect)(() => {
+  const [status, setStatus] = (0, import_react4.useState)(null);
+  const [isEditing, setIsEditing] = (0, import_react4.useState)(false);
+  (0, import_react4.useEffect)(() => {
     if (user) {
       setProfileForm({
         name: user.name || ""
@@ -43249,7 +43274,7 @@ function ProfileSection({ user, onUserUpdate }) {
     setIsEditing(!isEditing);
     setStatus(null);
   }
-  return /* @__PURE__ */ import_react3.default.createElement("section", null, /* @__PURE__ */ import_react3.default.createElement("h2", null, "My Profile"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "profile-info" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "info-card" }, /* @__PURE__ */ import_react3.default.createElement("h3", null, "Current Information"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react3.default.createElement("label", null, "Username:"), /* @__PURE__ */ import_react3.default.createElement("span", null, user?.name || "N/A")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react3.default.createElement("label", null, "Role:"), /* @__PURE__ */ import_react3.default.createElement("span", { className: `badge ${user?.role === "admin" ? "admin" : "user"}` }, user?.role === "admin" ? "Admin" : "POS User")))), status && /* @__PURE__ */ import_react3.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react3.default.createElement("div", { className: "profile-edit" }, !isEditing ? /* @__PURE__ */ import_react3.default.createElement("div", { className: "edit-actions" }, /* @__PURE__ */ import_react3.default.createElement(
+  return /* @__PURE__ */ import_react4.default.createElement("section", null, /* @__PURE__ */ import_react4.default.createElement("h2", null, "My Profile"), /* @__PURE__ */ import_react4.default.createElement("div", { className: "profile-info" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "info-card" }, /* @__PURE__ */ import_react4.default.createElement("h3", null, "Current Information"), /* @__PURE__ */ import_react4.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react4.default.createElement("label", null, "Username:"), /* @__PURE__ */ import_react4.default.createElement("span", null, user?.name || "N/A")), /* @__PURE__ */ import_react4.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react4.default.createElement("label", null, "Role:"), /* @__PURE__ */ import_react4.default.createElement("span", { className: `badge ${user?.role === "admin" ? "admin" : "user"}` }, user?.role === "admin" ? "Admin" : "POS User")))), status && /* @__PURE__ */ import_react4.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react4.default.createElement("div", { className: "profile-edit" }, !isEditing ? /* @__PURE__ */ import_react4.default.createElement("div", { className: "edit-actions" }, /* @__PURE__ */ import_react4.default.createElement(
     "button",
     {
       type: "button",
@@ -43257,7 +43282,7 @@ function ProfileSection({ user, onUserUpdate }) {
       className: "primary"
     },
     "Edit My Name"
-  )) : /* @__PURE__ */ import_react3.default.createElement("form", { className: "form-grid", onSubmit: handleProfileSubmit }, /* @__PURE__ */ import_react3.default.createElement("label", null, "New Name", /* @__PURE__ */ import_react3.default.createElement(
+  )) : /* @__PURE__ */ import_react4.default.createElement("form", { className: "form-grid", onSubmit: handleProfileSubmit }, /* @__PURE__ */ import_react4.default.createElement("label", null, "New Name", /* @__PURE__ */ import_react4.default.createElement(
     "input",
     {
       type: "text",
@@ -43267,7 +43292,7 @@ function ProfileSection({ user, onUserUpdate }) {
       placeholder: "Enter your new name",
       maxLength: 50
     }
-  )), /* @__PURE__ */ import_react3.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react3.default.createElement("button", { type: "submit" }, "Update Name"), /* @__PURE__ */ import_react3.default.createElement(
+  )), /* @__PURE__ */ import_react4.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react4.default.createElement("button", { type: "submit" }, "Update Name"), /* @__PURE__ */ import_react4.default.createElement(
     "button",
     {
       type: "button",
@@ -43279,7 +43304,7 @@ function ProfileSection({ user, onUserUpdate }) {
 }
 
 // src/renderer/pos/components/CustomersSection.jsx
-var import_react4 = __toESM(require_react());
+var import_react5 = __toESM(require_react());
 function CustomersSection({
   form,
   editingCustomerId,
@@ -43290,27 +43315,27 @@ function CustomersSection({
   onDelete,
   onCancelEdit
 }) {
-  return /* @__PURE__ */ import_react4.default.createElement("section", null, /* @__PURE__ */ import_react4.default.createElement("h2", null, "Customers / Mills"), /* @__PURE__ */ import_react4.default.createElement("form", { className: "form-grid", onSubmit }, /* @__PURE__ */ import_react4.default.createElement("label", null, "Name", /* @__PURE__ */ import_react4.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement("section", null, /* @__PURE__ */ import_react5.default.createElement("h2", null, "Customers / Mills"), /* @__PURE__ */ import_react5.default.createElement("form", { className: "form-grid", onSubmit }, /* @__PURE__ */ import_react5.default.createElement("label", null, "Name", /* @__PURE__ */ import_react5.default.createElement(
     "input",
     {
       required: true,
       value: form.name,
       onChange: (e2) => onFieldChange("name", e2.target.value)
     }
-  )), /* @__PURE__ */ import_react4.default.createElement("label", null, "GSTIN", /* @__PURE__ */ import_react4.default.createElement("input", { value: form.gstin, onChange: (e2) => onFieldChange("gstin", e2.target.value) })), /* @__PURE__ */ import_react4.default.createElement("label", null, "State", /* @__PURE__ */ import_react4.default.createElement("input", { value: form.state, onChange: (e2) => onFieldChange("state", e2.target.value) })), /* @__PURE__ */ import_react4.default.createElement("label", null, "State Code", /* @__PURE__ */ import_react4.default.createElement(
+  )), /* @__PURE__ */ import_react5.default.createElement("label", null, "GSTIN", /* @__PURE__ */ import_react5.default.createElement("input", { value: form.gstin, onChange: (e2) => onFieldChange("gstin", e2.target.value) })), /* @__PURE__ */ import_react5.default.createElement("label", null, "State", /* @__PURE__ */ import_react5.default.createElement("input", { value: form.state, onChange: (e2) => onFieldChange("state", e2.target.value) })), /* @__PURE__ */ import_react5.default.createElement("label", null, "State Code", /* @__PURE__ */ import_react5.default.createElement(
     "input",
     {
       value: form.state_code,
       onChange: (e2) => onFieldChange("state_code", e2.target.value)
     }
-  )), /* @__PURE__ */ import_react4.default.createElement("label", { className: "full" }, "Address", /* @__PURE__ */ import_react4.default.createElement(
+  )), /* @__PURE__ */ import_react5.default.createElement("label", { className: "full" }, "Address", /* @__PURE__ */ import_react5.default.createElement(
     "textarea",
     {
       rows: 2,
       value: form.address,
       onChange: (e2) => onFieldChange("address", e2.target.value)
     }
-  )), /* @__PURE__ */ import_react4.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react4.default.createElement("button", { type: "submit" }, editingCustomerId ? "Update" : "Add", " Customer"), editingCustomerId && /* @__PURE__ */ import_react4.default.createElement("button", { type: "button", className: "secondary", onClick: onCancelEdit }, "Cancel Edit"))), /* @__PURE__ */ import_react4.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react4.default.createElement("table", null, /* @__PURE__ */ import_react4.default.createElement("thead", null, /* @__PURE__ */ import_react4.default.createElement("tr", null, /* @__PURE__ */ import_react4.default.createElement("th", null, "Name"), /* @__PURE__ */ import_react4.default.createElement("th", null, "GSTIN"), /* @__PURE__ */ import_react4.default.createElement("th", null, "State"), /* @__PURE__ */ import_react4.default.createElement("th", null, "State Code"), /* @__PURE__ */ import_react4.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react4.default.createElement("tbody", null, customers.map((customer) => /* @__PURE__ */ import_react4.default.createElement("tr", { key: customer.id }, /* @__PURE__ */ import_react4.default.createElement("td", null, customer.name), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.gstin || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.state || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, customer.state_code || "-"), /* @__PURE__ */ import_react4.default.createElement("td", null, /* @__PURE__ */ import_react4.default.createElement("div", { className: "action-buttons" }, /* @__PURE__ */ import_react4.default.createElement(
+  )), /* @__PURE__ */ import_react5.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react5.default.createElement("button", { type: "submit" }, editingCustomerId ? "Update" : "Add", " Customer"), editingCustomerId && /* @__PURE__ */ import_react5.default.createElement("button", { type: "button", className: "secondary", onClick: onCancelEdit }, "Cancel Edit"))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react5.default.createElement("table", null, /* @__PURE__ */ import_react5.default.createElement("thead", null, /* @__PURE__ */ import_react5.default.createElement("tr", null, /* @__PURE__ */ import_react5.default.createElement("th", null, "Name"), /* @__PURE__ */ import_react5.default.createElement("th", null, "GSTIN"), /* @__PURE__ */ import_react5.default.createElement("th", null, "State"), /* @__PURE__ */ import_react5.default.createElement("th", null, "State Code"), /* @__PURE__ */ import_react5.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react5.default.createElement("tbody", null, customers.map((customer) => /* @__PURE__ */ import_react5.default.createElement("tr", { key: customer.id }, /* @__PURE__ */ import_react5.default.createElement("td", null, customer.name), /* @__PURE__ */ import_react5.default.createElement("td", null, customer.gstin || "-"), /* @__PURE__ */ import_react5.default.createElement("td", null, customer.state || "-"), /* @__PURE__ */ import_react5.default.createElement("td", null, customer.state_code || "-"), /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement("div", { className: "action-buttons" }, /* @__PURE__ */ import_react5.default.createElement(
     "button",
     {
       type: "button",
@@ -43318,7 +43343,7 @@ function CustomersSection({
       className: "edit-btn"
     },
     "Edit"
-  ), /* @__PURE__ */ import_react4.default.createElement(
+  ), /* @__PURE__ */ import_react5.default.createElement(
     "button",
     {
       type: "button",
@@ -43326,11 +43351,11 @@ function CustomersSection({
       className: "delete-btn"
     },
     "Delete"
-  ))))), !customers.length && /* @__PURE__ */ import_react4.default.createElement("tr", null, /* @__PURE__ */ import_react4.default.createElement("td", { colSpan: 5, className: "empty" }, "No customers added yet."))))));
+  ))))), !customers.length && /* @__PURE__ */ import_react5.default.createElement("tr", null, /* @__PURE__ */ import_react5.default.createElement("td", { colSpan: 5, className: "empty" }, "No customers added yet."))))));
 }
 
 // src/renderer/pos/components/BillingSection.jsx
-var import_react5 = __toESM(require_react());
+var import_react6 = __toESM(require_react());
 
 // src/renderer/pos/utils/format.js
 function formatCurrency(value) {
@@ -43358,16 +43383,16 @@ function BillingSection({
   onNotesChange,
   onSubmit
 }) {
-  return /* @__PURE__ */ import_react5.default.createElement("section", null, /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-header" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("h2", null, "Create Invoice"), /* @__PURE__ */ import_react5.default.createElement("p", null, "Invoice No. ", nextInvoiceNumber))), /* @__PURE__ */ import_react5.default.createElement("form", { onSubmit }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-meta" }, /* @__PURE__ */ import_react5.default.createElement("label", null, "Invoice Date", /* @__PURE__ */ import_react5.default.createElement("input", { type: "date", value: invoiceDate, onChange: (e2) => onDateChange(e2.target.value) })), /* @__PURE__ */ import_react5.default.createElement("label", null, "Customer", /* @__PURE__ */ import_react5.default.createElement("select", { value: invoiceCustomerId, onChange: (e2) => onCustomerChange(e2.target.value), required: true }, /* @__PURE__ */ import_react5.default.createElement("option", { value: "" }, "Select customer"), customers.map((customer) => /* @__PURE__ */ import_react5.default.createElement("option", { key: customer.id, value: customer.id }, customer.name))))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react5.default.createElement("table", { className: "invoice-table" }, /* @__PURE__ */ import_react5.default.createElement("thead", null, /* @__PURE__ */ import_react5.default.createElement("tr", null, /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "35%" } }, "Item"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "15%" } }, "Qty"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "15%" } }, "Rate"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "15%" } }, "Amount"), /* @__PURE__ */ import_react5.default.createElement("th", { style: { width: "10%" } }, "Actions"))), /* @__PURE__ */ import_react5.default.createElement("tbody", null, invoiceItems.map((row) => /* @__PURE__ */ import_react5.default.createElement("tr", { key: row.id }, /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement(
+  return /* @__PURE__ */ import_react6.default.createElement("section", null, /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-header" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("h2", null, "Create Invoice"), /* @__PURE__ */ import_react6.default.createElement("p", null, "Invoice No. ", nextInvoiceNumber))), /* @__PURE__ */ import_react6.default.createElement("form", { onSubmit }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-meta" }, /* @__PURE__ */ import_react6.default.createElement("label", null, "Invoice Date", /* @__PURE__ */ import_react6.default.createElement("input", { type: "date", value: invoiceDate, onChange: (e2) => onDateChange(e2.target.value) })), /* @__PURE__ */ import_react6.default.createElement("label", null, "Customer", /* @__PURE__ */ import_react6.default.createElement("select", { value: invoiceCustomerId, onChange: (e2) => onCustomerChange(e2.target.value), required: true }, /* @__PURE__ */ import_react6.default.createElement("option", { value: "" }, "Select customer"), customers.map((customer) => /* @__PURE__ */ import_react6.default.createElement("option", { key: customer.id, value: customer.id }, customer.name))))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react6.default.createElement("table", { className: "invoice-table" }, /* @__PURE__ */ import_react6.default.createElement("thead", null, /* @__PURE__ */ import_react6.default.createElement("tr", null, /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "35%" } }, "Item"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Qty"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Rate"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Amount"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "10%" } }, "Actions"))), /* @__PURE__ */ import_react6.default.createElement("tbody", null, invoiceItems.map((row) => /* @__PURE__ */ import_react6.default.createElement("tr", { key: row.id }, /* @__PURE__ */ import_react6.default.createElement("td", null, /* @__PURE__ */ import_react6.default.createElement(
     "select",
     {
       value: row.item_id,
       onChange: (e2) => onItemChange(row.id, "item_id", e2.target.value),
       required: true
     },
-    /* @__PURE__ */ import_react5.default.createElement("option", { value: "" }, "Select item"),
-    items.map((item) => /* @__PURE__ */ import_react5.default.createElement("option", { key: item.id, value: item.id }, item.name))
-  )), /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement(
+    /* @__PURE__ */ import_react6.default.createElement("option", { value: "" }, "Select item"),
+    items.map((item) => /* @__PURE__ */ import_react6.default.createElement("option", { key: item.id, value: item.id }, item.name))
+  )), /* @__PURE__ */ import_react6.default.createElement("td", null, /* @__PURE__ */ import_react6.default.createElement(
     "input",
     {
       type: "number",
@@ -43377,7 +43402,7 @@ function BillingSection({
       onChange: (e2) => onItemChange(row.id, "quantity", e2.target.value),
       required: true
     }
-  )), /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement(
+  )), /* @__PURE__ */ import_react6.default.createElement("td", null, /* @__PURE__ */ import_react6.default.createElement(
     "input",
     {
       type: "number",
@@ -43387,7 +43412,7 @@ function BillingSection({
       onChange: (e2) => onItemChange(row.id, "rate", e2.target.value),
       required: true
     }
-  )), /* @__PURE__ */ import_react5.default.createElement("td", null, formatCurrency(row.amount || 0)), /* @__PURE__ */ import_react5.default.createElement("td", null, /* @__PURE__ */ import_react5.default.createElement("button", { type: "button", className: "danger", onClick: () => onRemoveItem(row.id) }, "Remove")))), !invoiceItems.length && /* @__PURE__ */ import_react5.default.createElement("tr", null, /* @__PURE__ */ import_react5.default.createElement("td", { colSpan: 5, className: "empty" }, "Add items to start billing."))))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-actions" }, /* @__PURE__ */ import_react5.default.createElement("button", { type: "button", onClick: onAddItem }, "+ Add Item")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "invoice-summary" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("label", null, "Notes", /* @__PURE__ */ import_react5.default.createElement(
+  )), /* @__PURE__ */ import_react6.default.createElement("td", null, formatCurrency(row.amount || 0)), /* @__PURE__ */ import_react6.default.createElement("td", null, /* @__PURE__ */ import_react6.default.createElement("button", { type: "button", className: "danger", onClick: () => onRemoveItem(row.id) }, "Remove")))), !invoiceItems.length && /* @__PURE__ */ import_react6.default.createElement("tr", null, /* @__PURE__ */ import_react6.default.createElement("td", { colSpan: 5, className: "empty" }, "Add items to start billing."))))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-actions" }, /* @__PURE__ */ import_react6.default.createElement("button", { type: "button", onClick: onAddItem }, "+ Add Item")), /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-summary" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("label", null, "Notes", /* @__PURE__ */ import_react6.default.createElement(
     "textarea",
     {
       rows: 3,
@@ -43395,11 +43420,11 @@ function BillingSection({
       onChange: (e2) => onNotesChange(e2.target.value),
       placeholder: "Optional notes"
     }
-  ))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "summary-box" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "Subtotal"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.subtotal))), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "CGST ", gstSettings.enabled ? invoiceSummary.cgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.cgst))), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", null, "SGST ", gstSettings.enabled ? invoiceSummary.sgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.sgst))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "total" }, /* @__PURE__ */ import_react5.default.createElement("span", null, "Total"), /* @__PURE__ */ import_react5.default.createElement("strong", null, formatCurrency(invoiceSummary.total))), /* @__PURE__ */ import_react5.default.createElement("button", { type: "submit" }, "Save Invoice")))));
+  ))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "summary-box" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "Subtotal"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.subtotal))), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "CGST ", gstSettings.enabled ? invoiceSummary.cgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.cgst))), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "SGST ", gstSettings.enabled ? invoiceSummary.sgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.sgst))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "total" }, /* @__PURE__ */ import_react6.default.createElement("span", null, "Total"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.total))), /* @__PURE__ */ import_react6.default.createElement("button", { type: "submit" }, "Save Invoice")))));
 }
 
 // src/renderer/pos/components/InvoicesSection.jsx
-var import_react6 = __toESM(require_react());
+var import_react7 = __toESM(require_react());
 
 // node_modules/jspdf/dist/jspdf.es.min.js
 init_typeof();
@@ -57702,18 +57727,18 @@ function downloadInvoicePDF(invoice, company, customer, items) {
 
 // src/renderer/pos/components/InvoicesSection.jsx
 function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, company, onSelect }) {
-  return /* @__PURE__ */ import_react6.default.createElement("section", { className: "invoices-view" }, /* @__PURE__ */ import_react6.default.createElement("h2", null, "Invoices"), /* @__PURE__ */ import_react6.default.createElement("div", { className: "split" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react6.default.createElement("table", null, /* @__PURE__ */ import_react6.default.createElement("thead", null, /* @__PURE__ */ import_react6.default.createElement("tr", null, /* @__PURE__ */ import_react6.default.createElement("th", null, "No."), /* @__PURE__ */ import_react6.default.createElement("th", null, "Date"), /* @__PURE__ */ import_react6.default.createElement("th", null, "Customer"), /* @__PURE__ */ import_react6.default.createElement("th", null, "Total"))), /* @__PURE__ */ import_react6.default.createElement("tbody", null, invoices.map((invoice) => /* @__PURE__ */ import_react6.default.createElement(
+  return /* @__PURE__ */ import_react7.default.createElement("section", { className: "invoices-view" }, /* @__PURE__ */ import_react7.default.createElement("h2", null, "Invoices"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "split" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react7.default.createElement("table", null, /* @__PURE__ */ import_react7.default.createElement("thead", null, /* @__PURE__ */ import_react7.default.createElement("tr", null, /* @__PURE__ */ import_react7.default.createElement("th", null, "No."), /* @__PURE__ */ import_react7.default.createElement("th", null, "Date"), /* @__PURE__ */ import_react7.default.createElement("th", null, "Customer"), /* @__PURE__ */ import_react7.default.createElement("th", null, "Total"))), /* @__PURE__ */ import_react7.default.createElement("tbody", null, invoices.map((invoice) => /* @__PURE__ */ import_react7.default.createElement(
     "tr",
     {
       key: invoice.id,
       className: selectedInvoice?.id === invoice.id ? "selected" : "",
       onClick: () => onSelect(invoice)
     },
-    /* @__PURE__ */ import_react6.default.createElement("td", null, invoice.invoice_number),
-    /* @__PURE__ */ import_react6.default.createElement("td", null, invoice.invoice_date),
-    /* @__PURE__ */ import_react6.default.createElement("td", null, invoice.customer_name),
-    /* @__PURE__ */ import_react6.default.createElement("td", null, formatCurrency(invoice.total))
-  )), !invoices.length && /* @__PURE__ */ import_react6.default.createElement("tr", null, /* @__PURE__ */ import_react6.default.createElement("td", { colSpan: 4, className: "empty" }, "No invoices recorded yet."))))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-detail" }, invoiceDetails ? /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-header-actions" }, /* @__PURE__ */ import_react6.default.createElement("h3", null, "Invoice #", invoiceDetails.invoice.invoice_number), /* @__PURE__ */ import_react6.default.createElement(
+    /* @__PURE__ */ import_react7.default.createElement("td", null, invoice.invoice_number),
+    /* @__PURE__ */ import_react7.default.createElement("td", null, invoice.invoice_date),
+    /* @__PURE__ */ import_react7.default.createElement("td", null, invoice.customer_name),
+    /* @__PURE__ */ import_react7.default.createElement("td", null, formatCurrency(invoice.total))
+  )), !invoices.length && /* @__PURE__ */ import_react7.default.createElement("tr", null, /* @__PURE__ */ import_react7.default.createElement("td", { colSpan: 4, className: "empty" }, "No invoices recorded yet."))))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "invoice-detail" }, invoiceDetails ? /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement("div", { className: "invoice-header-actions" }, /* @__PURE__ */ import_react7.default.createElement("h3", null, "Invoice #", invoiceDetails.invoice.invoice_number), /* @__PURE__ */ import_react7.default.createElement(
     "button",
     {
       className: "primary",
@@ -57731,7 +57756,7 @@ function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, company, o
       )
     },
     "Download PDF"
-  )), /* @__PURE__ */ import_react6.default.createElement("p", null, /* @__PURE__ */ import_react6.default.createElement("strong", null, "Date:"), " ", invoiceDetails.invoice.invoice_date), /* @__PURE__ */ import_react6.default.createElement("p", null, /* @__PURE__ */ import_react6.default.createElement("strong", null, "Customer:"), " ", invoiceDetails.invoice.customer_name), /* @__PURE__ */ import_react6.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react6.default.createElement("table", null, /* @__PURE__ */ import_react6.default.createElement("thead", null, /* @__PURE__ */ import_react6.default.createElement("tr", null, /* @__PURE__ */ import_react6.default.createElement("th", null, "Item"), /* @__PURE__ */ import_react6.default.createElement("th", null, "Qty"), /* @__PURE__ */ import_react6.default.createElement("th", null, "Rate"), /* @__PURE__ */ import_react6.default.createElement("th", null, "Amount"))), /* @__PURE__ */ import_react6.default.createElement("tbody", null, invoiceDetails.items.map((item) => /* @__PURE__ */ import_react6.default.createElement("tr", { key: item.id }, /* @__PURE__ */ import_react6.default.createElement("td", null, item.item_name), /* @__PURE__ */ import_react6.default.createElement("td", null, item.quantity, " ", item.item_unit), /* @__PURE__ */ import_react6.default.createElement("td", null, formatCurrency(item.rate)), /* @__PURE__ */ import_react6.default.createElement("td", null, formatCurrency(item.amount))))))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "summary-box" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "Subtotal"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceDetails.invoice.subtotal))), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "CGST"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceDetails.invoice.cgst))), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "SGST"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceDetails.invoice.sgst))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "total" }, /* @__PURE__ */ import_react6.default.createElement("span", null, "Total"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceDetails.invoice.total))))) : /* @__PURE__ */ import_react6.default.createElement("div", { className: "placeholder" }, "Select an invoice to view details."))));
+  )), /* @__PURE__ */ import_react7.default.createElement("p", null, /* @__PURE__ */ import_react7.default.createElement("strong", null, "Date:"), " ", invoiceDetails.invoice.invoice_date), /* @__PURE__ */ import_react7.default.createElement("p", null, /* @__PURE__ */ import_react7.default.createElement("strong", null, "Customer:"), " ", invoiceDetails.invoice.customer_name), /* @__PURE__ */ import_react7.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react7.default.createElement("table", null, /* @__PURE__ */ import_react7.default.createElement("thead", null, /* @__PURE__ */ import_react7.default.createElement("tr", null, /* @__PURE__ */ import_react7.default.createElement("th", null, "Item"), /* @__PURE__ */ import_react7.default.createElement("th", null, "Qty"), /* @__PURE__ */ import_react7.default.createElement("th", null, "Rate"), /* @__PURE__ */ import_react7.default.createElement("th", null, "Amount"))), /* @__PURE__ */ import_react7.default.createElement("tbody", null, invoiceDetails.items.map((item) => /* @__PURE__ */ import_react7.default.createElement("tr", { key: item.id }, /* @__PURE__ */ import_react7.default.createElement("td", null, item.item_name), /* @__PURE__ */ import_react7.default.createElement("td", null, item.quantity, " ", item.item_unit), /* @__PURE__ */ import_react7.default.createElement("td", null, formatCurrency(item.rate)), /* @__PURE__ */ import_react7.default.createElement("td", null, formatCurrency(item.amount))))))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "summary-box" }, /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement("span", null, "Subtotal"), /* @__PURE__ */ import_react7.default.createElement("strong", null, formatCurrency(invoiceDetails.invoice.subtotal))), /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement("span", null, "CGST"), /* @__PURE__ */ import_react7.default.createElement("strong", null, formatCurrency(invoiceDetails.invoice.cgst))), /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement("span", null, "SGST"), /* @__PURE__ */ import_react7.default.createElement("strong", null, formatCurrency(invoiceDetails.invoice.sgst))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "total" }, /* @__PURE__ */ import_react7.default.createElement("span", null, "Total"), /* @__PURE__ */ import_react7.default.createElement("strong", null, formatCurrency(invoiceDetails.invoice.total))))) : /* @__PURE__ */ import_react7.default.createElement("div", { className: "placeholder" }, "Select an invoice to view details."))));
 }
 
 // src/renderer/pos/constants.js
@@ -57744,10 +57769,10 @@ var TAB_DEFINITIONS = [
 var emptyCustomer = { name: "", address: "", gstin: "", state: "", state_code: "" };
 
 // src/renderer/pos/hooks/useStatusMessage.js
-var import_react7 = __toESM(require_react());
+var import_react8 = __toESM(require_react());
 function useStatusMessage(timeout = 4e3) {
-  const [message, setMessage] = (0, import_react7.useState)(null);
-  (0, import_react7.useEffect)(() => {
+  const [message, setMessage] = (0, import_react8.useState)(null);
+  (0, import_react8.useEffect)(() => {
     if (!message)
       return void 0;
     const timer = setTimeout(() => setMessage(null), timeout);
@@ -57757,17 +57782,17 @@ function useStatusMessage(timeout = 4e3) {
 }
 
 // src/renderer/admin/components/AppHeader.jsx
-var import_react8 = __toESM(require_react());
-function AppHeader2({ onLogout, user, company }) {
+var import_react9 = __toESM(require_react());
+function AppHeader2({ onLogout, user, company, items }) {
   const name = company?.name?.trim() || "Textile Job Work POS";
   const location2 = company?.address?.trim() || "Location pending";
-  return /* @__PURE__ */ import_react8.default.createElement("header", { className: "app-header" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "logo-circle" }, name?.slice(0, 2)?.toUpperCase() || "TP"), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement("p", { className: "subtitle" }, location2), /* @__PURE__ */ import_react8.default.createElement("h1", null, name)), user && /* @__PURE__ */ import_react8.default.createElement("div", { className: "header-actions" }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "badge" }, user.role === "admin" ? "ADMIN" : "POS", " - ", user.name?.toUpperCase()), /* @__PURE__ */ import_react8.default.createElement("button", { type: "button", className: "secondary", onClick: onLogout }, "Logout")));
+  return /* @__PURE__ */ import_react9.default.createElement("header", { className: "app-header" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "logo-circle" }, name?.slice(0, 2)?.toUpperCase() || "TP"), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("p", { className: "subtitle" }, location2), /* @__PURE__ */ import_react9.default.createElement("h1", null, name)), user && /* @__PURE__ */ import_react9.default.createElement("div", { className: "header-actions" }, /* @__PURE__ */ import_react9.default.createElement(StockNotification, { items }), /* @__PURE__ */ import_react9.default.createElement("span", { className: "badge" }, user.role === "admin" ? "ADMIN" : "POS", " - ", user.name?.toUpperCase()), /* @__PURE__ */ import_react9.default.createElement("button", { type: "button", className: "secondary", onClick: onLogout }, "Logout")));
 }
 
 // src/renderer/admin/components/TabBar.jsx
-var import_react9 = __toESM(require_react());
+var import_react10 = __toESM(require_react());
 function TabBar2({ tabs, activeTab, onChange }) {
-  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "tabs" }, tabs.map((tab) => /* @__PURE__ */ import_react9.default.createElement(
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "tabs" }, tabs.map((tab) => /* @__PURE__ */ import_react10.default.createElement(
     "button",
     {
       key: tab.key,
@@ -57779,27 +57804,27 @@ function TabBar2({ tabs, activeTab, onChange }) {
 }
 
 // src/renderer/admin/components/CompanySection.jsx
-var import_react10 = __toESM(require_react());
+var import_react11 = __toESM(require_react());
 function CompanySection({ form, onFieldChange, onSubmit }) {
-  return /* @__PURE__ */ import_react10.default.createElement("section", null, /* @__PURE__ */ import_react10.default.createElement("h2", null, "Company Setup"), /* @__PURE__ */ import_react10.default.createElement("form", { className: "form-grid", onSubmit }, /* @__PURE__ */ import_react10.default.createElement("label", null, "Company Name", /* @__PURE__ */ import_react10.default.createElement(
+  return /* @__PURE__ */ import_react11.default.createElement("section", null, /* @__PURE__ */ import_react11.default.createElement("h2", null, "Company Setup"), /* @__PURE__ */ import_react11.default.createElement("form", { className: "form-grid", onSubmit }, /* @__PURE__ */ import_react11.default.createElement("label", null, "Company Name", /* @__PURE__ */ import_react11.default.createElement(
     "input",
     {
       required: true,
       value: form.name,
       onChange: (e2) => onFieldChange("name", e2.target.value)
     }
-  )), /* @__PURE__ */ import_react10.default.createElement("label", null, "GSTIN", /* @__PURE__ */ import_react10.default.createElement("input", { value: form.gstin, onChange: (e2) => onFieldChange("gstin", e2.target.value) })), /* @__PURE__ */ import_react10.default.createElement("label", { className: "full" }, "Address", /* @__PURE__ */ import_react10.default.createElement(
+  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "GSTIN", /* @__PURE__ */ import_react11.default.createElement("input", { value: form.gstin, onChange: (e2) => onFieldChange("gstin", e2.target.value) })), /* @__PURE__ */ import_react11.default.createElement("label", { className: "full" }, "Address", /* @__PURE__ */ import_react11.default.createElement(
     "textarea",
     {
       rows: 3,
       value: form.address,
       onChange: (e2) => onFieldChange("address", e2.target.value)
     }
-  )), /* @__PURE__ */ import_react10.default.createElement("label", null, "Phone", /* @__PURE__ */ import_react10.default.createElement("input", { value: form.phone, onChange: (e2) => onFieldChange("phone", e2.target.value) })), /* @__PURE__ */ import_react10.default.createElement("div", { className: "full" }, /* @__PURE__ */ import_react10.default.createElement("button", { type: "submit" }, "Save Company"))));
+  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Phone", /* @__PURE__ */ import_react11.default.createElement("input", { value: form.phone, onChange: (e2) => onFieldChange("phone", e2.target.value) })), /* @__PURE__ */ import_react11.default.createElement("div", { className: "full" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "submit" }, "Save Company"))));
 }
 
 // src/renderer/admin/components/InventorySection.jsx
-var import_react11 = __toESM(require_react());
+var import_react12 = __toESM(require_react());
 
 // src/renderer/admin/utils/format.js
 function formatCurrency2(value) {
@@ -57822,11 +57847,11 @@ function InventorySection({
   onDelete
   // Add delete callback
 }) {
-  const [csvFile, setCsvFile] = (0, import_react11.useState)(null);
-  const [isImporting, setIsImporting] = (0, import_react11.useState)(false);
-  const [deleteStatus, setDeleteStatus] = (0, import_react11.useState)(null);
-  const [filterCategory, setFilterCategory] = (0, import_react11.useState)("all");
-  const [searchTerm, setSearchTerm] = (0, import_react11.useState)("");
+  const [csvFile, setCsvFile] = (0, import_react12.useState)(null);
+  const [isImporting, setIsImporting] = (0, import_react12.useState)(false);
+  const [deleteStatus, setDeleteStatus] = (0, import_react12.useState)(null);
+  const [filterCategory, setFilterCategory] = (0, import_react12.useState)("all");
+  const [searchTerm, setSearchTerm] = (0, import_react12.useState)("");
   const handleCSVUpload = (event) => {
     const file = event.target.files[0];
     if (file && file.type === "text/csv") {
@@ -57927,7 +57952,7 @@ function InventorySection({
       setDeleteStatus("Failed to delete item: " + error.message);
     }
   };
-  import_react11.default.useEffect(() => {
+  import_react12.default.useEffect(() => {
     if (deleteStatus) {
       const timer = setTimeout(() => setDeleteStatus(null), 3e3);
       return () => clearTimeout(timer);
@@ -57940,7 +57965,7 @@ function InventorySection({
     return matchesSearch && matchesCategory;
   });
   const categories = ["all", ...new Set(items.map((item) => item.category).filter(Boolean))];
-  return /* @__PURE__ */ import_react11.default.createElement("section", { className: "inventory-section" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-header" }, /* @__PURE__ */ import_react11.default.createElement("h2", null, "Inventory Management"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-stats" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "stat-card" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "stat-number" }, items.length), /* @__PURE__ */ import_react11.default.createElement("span", { className: "stat-label" }, "Total Items")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "stat-card" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "stat-number" }, items.reduce((sum, item) => sum + item.quantity, 0)), /* @__PURE__ */ import_react11.default.createElement("span", { className: "stat-label" }, "Total Quantity")))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-list-main" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "list-header" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, "Item Inventory"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "list-filters" }, /* @__PURE__ */ import_react11.default.createElement(
+  return /* @__PURE__ */ import_react12.default.createElement("section", { className: "inventory-section" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "inventory-header" }, /* @__PURE__ */ import_react12.default.createElement("h2", null, "Inventory Management"), /* @__PURE__ */ import_react12.default.createElement("div", { className: "inventory-stats" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "stat-card" }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "stat-number" }, items.length), /* @__PURE__ */ import_react12.default.createElement("span", { className: "stat-label" }, "Total Items")), /* @__PURE__ */ import_react12.default.createElement("div", { className: "stat-card" }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "stat-number" }, items.reduce((sum, item) => sum + item.quantity, 0)), /* @__PURE__ */ import_react12.default.createElement("span", { className: "stat-label" }, "Total Quantity")))), /* @__PURE__ */ import_react12.default.createElement("div", { className: "inventory-list-main" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "list-header" }, /* @__PURE__ */ import_react12.default.createElement("h3", null, "Item Inventory"), /* @__PURE__ */ import_react12.default.createElement("div", { className: "list-filters" }, /* @__PURE__ */ import_react12.default.createElement(
     "input",
     {
       type: "text",
@@ -57949,15 +57974,15 @@ function InventorySection({
       onChange: (e2) => setSearchTerm(e2.target.value),
       className: "search-input"
     }
-  ), /* @__PURE__ */ import_react11.default.createElement(
+  ), /* @__PURE__ */ import_react12.default.createElement(
     "select",
     {
       value: filterCategory,
       onChange: (e2) => setFilterCategory(e2.target.value),
       className: "category-filter"
     },
-    categories.map((category) => /* @__PURE__ */ import_react11.default.createElement("option", { key: category, value: category }, category === "all" ? "All Categories" : category))
-  ))), showDeleteStatus && deleteStatus && /* @__PURE__ */ import_react11.default.createElement("div", { className: `delete-status ${deleteStatus.includes("success") ? "success" : "error"}` }, deleteStatus), /* @__PURE__ */ import_react11.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react11.default.createElement("table", { className: "inventory-table" }, /* @__PURE__ */ import_react11.default.createElement("thead", null, /* @__PURE__ */ import_react11.default.createElement("tr", null, /* @__PURE__ */ import_react11.default.createElement("th", null, "Item Name"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Category"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Unit"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Stock"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Rate"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Value"), /* @__PURE__ */ import_react11.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react11.default.createElement("tbody", null, filteredItems.length > 0 ? filteredItems.map((item) => /* @__PURE__ */ import_react11.default.createElement("tr", { key: item.id, className: "inventory-row" }, /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-name" }, item.name), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-category" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "category-badge" }, item.category || "Uncategorized")), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-unit" }, item.unit), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-quantity" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: `quantity-badge ${item.quantity < 10 ? "low-stock" : "in-stock"}` }, item.quantity)), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-rate" }, formatCurrency2(item.rate)), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-value" }, formatCurrency2(item.quantity * item.rate)), /* @__PURE__ */ import_react11.default.createElement("td", { className: "item-actions" }, /* @__PURE__ */ import_react11.default.createElement(
+    categories.map((category) => /* @__PURE__ */ import_react12.default.createElement("option", { key: category, value: category }, category === "all" ? "All Categories" : category))
+  ))), showDeleteStatus && deleteStatus && /* @__PURE__ */ import_react12.default.createElement("div", { className: `delete-status ${deleteStatus.includes("success") ? "success" : "error"}` }, deleteStatus), /* @__PURE__ */ import_react12.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react12.default.createElement("table", { className: "inventory-table" }, /* @__PURE__ */ import_react12.default.createElement("thead", null, /* @__PURE__ */ import_react12.default.createElement("tr", null, /* @__PURE__ */ import_react12.default.createElement("th", null, "Item Name"), /* @__PURE__ */ import_react12.default.createElement("th", null, "Category"), /* @__PURE__ */ import_react12.default.createElement("th", null, "Unit"), /* @__PURE__ */ import_react12.default.createElement("th", null, "Stock"), /* @__PURE__ */ import_react12.default.createElement("th", null, "Rate"), /* @__PURE__ */ import_react12.default.createElement("th", null, "Value"), /* @__PURE__ */ import_react12.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react12.default.createElement("tbody", null, filteredItems.length > 0 ? filteredItems.map((item) => /* @__PURE__ */ import_react12.default.createElement("tr", { key: item.id, className: "inventory-row" }, /* @__PURE__ */ import_react12.default.createElement("td", { className: "item-name" }, item.name), /* @__PURE__ */ import_react12.default.createElement("td", { className: "item-category" }, item.category || "Uncategorized"), /* @__PURE__ */ import_react12.default.createElement("td", { className: "item-unit" }, item.unit), /* @__PURE__ */ import_react12.default.createElement("td", { className: "item-quantity" }, /* @__PURE__ */ import_react12.default.createElement("span", { className: `quantity-badge ${item.quantity < 10 ? "low-stock" : "in-stock"}` }, item.quantity)), /* @__PURE__ */ import_react12.default.createElement("td", { className: "item-rate" }, formatCurrency2(item.rate)), /* @__PURE__ */ import_react12.default.createElement("td", { className: "item-value" }, formatCurrency2(item.quantity * item.rate)), /* @__PURE__ */ import_react12.default.createElement("td", { className: "item-actions" }, /* @__PURE__ */ import_react12.default.createElement(
     "button",
     {
       type: "button",
@@ -57965,7 +57990,7 @@ function InventorySection({
       className: "action-btn edit-btn"
     },
     "Edit"
-  ), /* @__PURE__ */ import_react11.default.createElement(
+  ), /* @__PURE__ */ import_react12.default.createElement(
     "button",
     {
       type: "button",
@@ -57973,7 +57998,7 @@ function InventorySection({
       className: "action-btn delete-btn"
     },
     "Delete"
-  )))) : /* @__PURE__ */ import_react11.default.createElement("tr", null, /* @__PURE__ */ import_react11.default.createElement("td", { colSpan: 7, className: "empty-state" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "empty-message" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "empty-icon" }, "\u{1F4E6}"), /* @__PURE__ */ import_react11.default.createElement("p", null, "No items found"), /* @__PURE__ */ import_react11.default.createElement("p", null, "Try adjusting your search or add new items")))))))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-forms-section" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "inventory-form" }, /* @__PURE__ */ import_react11.default.createElement("form", { className: "form-grid", onSubmit }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "form-section" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, editingItemId ? "Edit Item" : "Add New Item"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "form-grid" }, /* @__PURE__ */ import_react11.default.createElement("label", null, "Item Name", /* @__PURE__ */ import_react11.default.createElement(
+  )))) : /* @__PURE__ */ import_react12.default.createElement("tr", null, /* @__PURE__ */ import_react12.default.createElement("td", { colSpan: 7, className: "empty-state" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "empty-message" }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "empty-icon" }, "\u{1F4E6}"), /* @__PURE__ */ import_react12.default.createElement("p", null, "No items found"), /* @__PURE__ */ import_react12.default.createElement("p", null, "Try adjusting your search or add new items")))))))), /* @__PURE__ */ import_react12.default.createElement("div", { className: "inventory-forms-section" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "inventory-form" }, /* @__PURE__ */ import_react12.default.createElement("form", { className: "form-grid", onSubmit }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "form-section" }, /* @__PURE__ */ import_react12.default.createElement("h3", null, editingItemId ? "Edit Item" : "Add New Item"), /* @__PURE__ */ import_react12.default.createElement("div", { className: "form-grid" }, /* @__PURE__ */ import_react12.default.createElement("label", null, "Item Name", /* @__PURE__ */ import_react12.default.createElement(
     "input",
     {
       required: true,
@@ -57981,14 +58006,14 @@ function InventorySection({
       onChange: (e2) => onFieldChange("name", e2.target.value),
       placeholder: "Enter item name"
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Category", /* @__PURE__ */ import_react11.default.createElement(
+  )), /* @__PURE__ */ import_react12.default.createElement("label", null, "Category", /* @__PURE__ */ import_react12.default.createElement(
     "input",
     {
       value: form.category,
       onChange: (e2) => onFieldChange("category", e2.target.value),
       placeholder: "e.g., Clothing, Accessories"
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Unit", /* @__PURE__ */ import_react11.default.createElement("select", { value: form.unit, onChange: (e2) => onFieldChange("unit", e2.target.value) }, units2.map((unit) => /* @__PURE__ */ import_react11.default.createElement("option", { key: unit, value: unit }, unit)))), /* @__PURE__ */ import_react11.default.createElement("label", null, "Available Qty", /* @__PURE__ */ import_react11.default.createElement(
+  )), /* @__PURE__ */ import_react12.default.createElement("label", null, "Unit", /* @__PURE__ */ import_react12.default.createElement("select", { value: form.unit, onChange: (e2) => onFieldChange("unit", e2.target.value) }, units2.map((unit) => /* @__PURE__ */ import_react12.default.createElement("option", { key: unit, value: unit }, unit)))), /* @__PURE__ */ import_react12.default.createElement("label", null, "Available Qty", /* @__PURE__ */ import_react12.default.createElement(
     "input",
     {
       type: "number",
@@ -57998,7 +58023,7 @@ function InventorySection({
       onChange: (e2) => onFieldChange("quantity", e2.target.value),
       placeholder: "0"
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("label", null, "Rate (\u20B9)", /* @__PURE__ */ import_react11.default.createElement(
+  )), /* @__PURE__ */ import_react12.default.createElement("label", null, "Rate (\u20B9)", /* @__PURE__ */ import_react12.default.createElement(
     "input",
     {
       type: "number",
@@ -58008,7 +58033,7 @@ function InventorySection({
       onChange: (e2) => onFieldChange("rate", e2.target.value),
       placeholder: "0.00"
     }
-  ))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react11.default.createElement("button", { type: "submit", className: "primary" }, editingItemId ? "Update Item" : "Add Item"), editingItemId && /* @__PURE__ */ import_react11.default.createElement("button", { type: "button", className: "secondary", onClick: onCancelEdit }, "Cancel"))))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "csv-import-section" }, /* @__PURE__ */ import_react11.default.createElement("h3", null, "Bulk Import"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "csv-upload-area" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "file-upload-wrapper" }, /* @__PURE__ */ import_react11.default.createElement("label", { htmlFor: "csv-upload", className: "file-upload-btn" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "upload-icon" }, "\u{1F4C1}"), /* @__PURE__ */ import_react11.default.createElement("span", null, csvFile ? csvFile.name : "Choose CSV File"), /* @__PURE__ */ import_react11.default.createElement(
+  ))), /* @__PURE__ */ import_react12.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react12.default.createElement("button", { type: "submit", className: "primary" }, editingItemId ? "Update Item" : "Add Item"), editingItemId && /* @__PURE__ */ import_react12.default.createElement("button", { type: "button", className: "secondary", onClick: onCancelEdit }, "Cancel"))))), /* @__PURE__ */ import_react12.default.createElement("div", { className: "csv-import-section" }, /* @__PURE__ */ import_react12.default.createElement("h3", null, "Bulk Import"), /* @__PURE__ */ import_react12.default.createElement("div", { className: "csv-upload-area" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "file-upload-wrapper" }, /* @__PURE__ */ import_react12.default.createElement("label", { htmlFor: "csv-upload", className: "file-upload-btn" }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "upload-icon" }, "\u{1F4C1}"), /* @__PURE__ */ import_react12.default.createElement("span", null, csvFile ? csvFile.name : "Choose CSV File"), /* @__PURE__ */ import_react12.default.createElement(
     "input",
     {
       id: "csv-upload",
@@ -58016,7 +58041,7 @@ function InventorySection({
       accept: ".csv",
       onChange: handleCSVUpload
     }
-  ))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "csv-format-info" }, /* @__PURE__ */ import_react11.default.createElement("h4", null, "CSV Format:"), /* @__PURE__ */ import_react11.default.createElement("code", null, "name, category, unit, rate, quantity"), /* @__PURE__ */ import_react11.default.createElement("p", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, "Example:"), " Shirt, Clothing, pieces, 150, 50")), /* @__PURE__ */ import_react11.default.createElement(
+  ))), /* @__PURE__ */ import_react12.default.createElement("div", { className: "csv-format-info" }, /* @__PURE__ */ import_react12.default.createElement("h4", null, "CSV Format:"), /* @__PURE__ */ import_react12.default.createElement("code", null, "name, category, unit, rate, quantity"), /* @__PURE__ */ import_react12.default.createElement("p", null, /* @__PURE__ */ import_react12.default.createElement("strong", null, "Example:"), " Shirt, Clothing, pieces, 150, 50")), /* @__PURE__ */ import_react12.default.createElement(
     "button",
     {
       type: "button",
@@ -58029,17 +58054,17 @@ function InventorySection({
 }
 
 // src/renderer/admin/components/UserManagementSection.jsx
-var import_react12 = __toESM(require_react());
+var import_react13 = __toESM(require_react());
 function UserManagementSection() {
-  const [users, setUsers] = (0, import_react12.useState)([]);
-  const [userForm, setUserForm] = (0, import_react12.useState)({
+  const [users, setUsers] = (0, import_react13.useState)([]);
+  const [userForm, setUserForm] = (0, import_react13.useState)({
     name: "",
     password: "",
     role: "pos"
   });
-  const [editingUserId, setEditingUserId] = (0, import_react12.useState)(null);
-  const [status, setStatus] = (0, import_react12.useState)(null);
-  (0, import_react12.useEffect)(() => {
+  const [editingUserId, setEditingUserId] = (0, import_react13.useState)(null);
+  const [status, setStatus] = (0, import_react13.useState)(null);
+  (0, import_react13.useEffect)(() => {
     refreshUsers();
   }, []);
   async function refreshUsers() {
@@ -58114,7 +58139,7 @@ function UserManagementSection() {
       setStatus({ type: "error", text: error.message || "Failed to delete user" });
     }
   }
-  return /* @__PURE__ */ import_react12.default.createElement("section", { className: "user-management-section" }, /* @__PURE__ */ import_react12.default.createElement("h2", null, "User Management"), status && /* @__PURE__ */ import_react12.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react12.default.createElement("form", { className: "form-grid", onSubmit: handleUserSubmit }, /* @__PURE__ */ import_react12.default.createElement("label", null, "User Name", /* @__PURE__ */ import_react12.default.createElement(
+  return /* @__PURE__ */ import_react13.default.createElement("section", { className: "user-management-section" }, /* @__PURE__ */ import_react13.default.createElement("h2", null, "User Management"), status && /* @__PURE__ */ import_react13.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react13.default.createElement("form", { className: "form-grid", onSubmit: handleUserSubmit }, /* @__PURE__ */ import_react13.default.createElement("label", null, "User Name", /* @__PURE__ */ import_react13.default.createElement(
     "input",
     {
       required: true,
@@ -58122,15 +58147,15 @@ function UserManagementSection() {
       onChange: (e2) => updateUserField("name", e2.target.value),
       placeholder: "Enter user name"
     }
-  )), /* @__PURE__ */ import_react12.default.createElement("label", null, "Role", /* @__PURE__ */ import_react12.default.createElement(
+  )), /* @__PURE__ */ import_react13.default.createElement("label", null, "Role", /* @__PURE__ */ import_react13.default.createElement(
     "select",
     {
       value: userForm.role,
       onChange: (e2) => updateUserField("role", e2.target.value)
     },
-    /* @__PURE__ */ import_react12.default.createElement("option", { value: "pos" }, "POS User"),
-    /* @__PURE__ */ import_react12.default.createElement("option", { value: "admin" }, "Admin")
-  )), !editingUserId && /* @__PURE__ */ import_react12.default.createElement("label", null, "Password", /* @__PURE__ */ import_react12.default.createElement(
+    /* @__PURE__ */ import_react13.default.createElement("option", { value: "pos" }, "POS User"),
+    /* @__PURE__ */ import_react13.default.createElement("option", { value: "admin" }, "Admin")
+  )), !editingUserId && /* @__PURE__ */ import_react13.default.createElement("label", null, "Password", /* @__PURE__ */ import_react13.default.createElement(
     "input",
     {
       type: "password",
@@ -58139,7 +58164,7 @@ function UserManagementSection() {
       onChange: (e2) => updateUserField("password", e2.target.value),
       placeholder: "Enter password"
     }
-  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react12.default.createElement("button", { type: "submit" }, editingUserId ? "Update User" : "Add User"), editingUserId && /* @__PURE__ */ import_react12.default.createElement("button", { type: "button", className: "secondary", onClick: resetUserForm }, "Cancel Edit"))), /* @__PURE__ */ import_react12.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react12.default.createElement("table", null, /* @__PURE__ */ import_react12.default.createElement("thead", null, /* @__PURE__ */ import_react12.default.createElement("tr", null, /* @__PURE__ */ import_react12.default.createElement("th", null, "Name"), /* @__PURE__ */ import_react12.default.createElement("th", null, "Role"), /* @__PURE__ */ import_react12.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react12.default.createElement("tbody", null, users.map((user) => /* @__PURE__ */ import_react12.default.createElement("tr", { key: user.id }, /* @__PURE__ */ import_react12.default.createElement("td", null, user.name), /* @__PURE__ */ import_react12.default.createElement("td", null, /* @__PURE__ */ import_react12.default.createElement("span", { className: `badge ${user.role === "admin" ? "admin" : "user"}` }, user.role === "admin" ? "Admin" : "POS")), /* @__PURE__ */ import_react12.default.createElement("td", null, /* @__PURE__ */ import_react12.default.createElement("div", { className: "action-buttons" }, /* @__PURE__ */ import_react12.default.createElement(
+  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react13.default.createElement("button", { type: "submit" }, editingUserId ? "Update User" : "Add User"), editingUserId && /* @__PURE__ */ import_react13.default.createElement("button", { type: "button", className: "secondary", onClick: resetUserForm }, "Cancel Edit"))), /* @__PURE__ */ import_react13.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react13.default.createElement("table", null, /* @__PURE__ */ import_react13.default.createElement("thead", null, /* @__PURE__ */ import_react13.default.createElement("tr", null, /* @__PURE__ */ import_react13.default.createElement("th", null, "Name"), /* @__PURE__ */ import_react13.default.createElement("th", null, "Role"), /* @__PURE__ */ import_react13.default.createElement("th", null, "Actions"))), /* @__PURE__ */ import_react13.default.createElement("tbody", null, users.map((user) => /* @__PURE__ */ import_react13.default.createElement("tr", { key: user.id }, /* @__PURE__ */ import_react13.default.createElement("td", null, user.name), /* @__PURE__ */ import_react13.default.createElement("td", null, /* @__PURE__ */ import_react13.default.createElement("span", { className: `badge ${user.role === "admin" ? "admin" : "user"}` }, user.role === "admin" ? "Admin" : "POS")), /* @__PURE__ */ import_react13.default.createElement("td", null, /* @__PURE__ */ import_react13.default.createElement("div", { className: "action-buttons" }, /* @__PURE__ */ import_react13.default.createElement(
     "button",
     {
       type: "button",
@@ -58147,7 +58172,7 @@ function UserManagementSection() {
       className: "edit-btn"
     },
     "Edit"
-  ), /* @__PURE__ */ import_react12.default.createElement(
+  ), /* @__PURE__ */ import_react13.default.createElement(
     "button",
     {
       type: "button",
@@ -58155,25 +58180,25 @@ function UserManagementSection() {
       className: "delete-btn"
     },
     "Delete"
-  ))))), !users.length && /* @__PURE__ */ import_react12.default.createElement("tr", null, /* @__PURE__ */ import_react12.default.createElement("td", { colSpan: 3, className: "empty" }, "No users found. Add your first user above."))))));
+  ))))), !users.length && /* @__PURE__ */ import_react13.default.createElement("tr", null, /* @__PURE__ */ import_react13.default.createElement("td", { colSpan: 3, className: "empty" }, "No users found. Add your first user above."))))));
 }
 
 // src/renderer/admin/components/GSTConfigurationSection.jsx
-var import_react13 = __toESM(require_react());
+var import_react14 = __toESM(require_react());
 function GSTConfigurationSection() {
-  const [gstSettings, setGSTSettings] = (0, import_react13.useState)({
+  const [gstSettings, setGSTSettings] = (0, import_react14.useState)({
     cgst_percent: 2.5,
     sgst_percent: 2.5,
     enabled: true
   });
-  const [form, setForm] = (0, import_react13.useState)({
+  const [form, setForm] = (0, import_react14.useState)({
     cgst_percent: "",
     sgst_percent: "",
     enabled: true
   });
-  const [status, setStatus] = (0, import_react13.useState)(null);
-  const [isEditing, setIsEditing] = (0, import_react13.useState)(false);
-  (0, import_react13.useEffect)(() => {
+  const [status, setStatus] = (0, import_react14.useState)(null);
+  const [isEditing, setIsEditing] = (0, import_react14.useState)(false);
+  (0, import_react14.useEffect)(() => {
     loadGSTSettings();
   }, []);
   async function loadGSTSettings() {
@@ -58226,7 +58251,7 @@ function GSTConfigurationSection() {
   function calculateTotalGST() {
     return (gstSettings.cgst_percent || 0) + (gstSettings.sgst_percent || 0);
   }
-  return /* @__PURE__ */ import_react13.default.createElement("section", null, /* @__PURE__ */ import_react13.default.createElement("h2", null, "GST Configuration"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "gst-info" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-card" }, /* @__PURE__ */ import_react13.default.createElement("h3", null, "Current GST Settings"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "Status:"), /* @__PURE__ */ import_react13.default.createElement("span", { className: `badge ${gstSettings.enabled ? "enabled" : "disabled"}` }, gstSettings.enabled ? "Enabled" : "Disabled")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "CGST Rate:"), /* @__PURE__ */ import_react13.default.createElement("span", null, (gstSettings.cgst_percent || 0).toFixed(2), "%")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "SGST Rate:"), /* @__PURE__ */ import_react13.default.createElement("span", null, (gstSettings.sgst_percent || 0).toFixed(2), "%")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "Total GST:"), /* @__PURE__ */ import_react13.default.createElement("span", { className: "total-gst" }, calculateTotalGST().toFixed(2), "%")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react13.default.createElement("label", null, "Last Updated:"), /* @__PURE__ */ import_react13.default.createElement("span", null, gstSettings.updated_at ? new Date(gstSettings.updated_at).toLocaleString() : "Never")))), status && /* @__PURE__ */ import_react13.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react13.default.createElement("div", { className: "gst-edit" }, !isEditing ? /* @__PURE__ */ import_react13.default.createElement("div", { className: "edit-actions" }, /* @__PURE__ */ import_react13.default.createElement(
+  return /* @__PURE__ */ import_react14.default.createElement("section", null, /* @__PURE__ */ import_react14.default.createElement("h2", null, "GST Configuration"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "gst-info" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "info-card" }, /* @__PURE__ */ import_react14.default.createElement("h3", null, "Current GST Settings"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react14.default.createElement("label", null, "Status:"), /* @__PURE__ */ import_react14.default.createElement("span", { className: `badge ${gstSettings.enabled ? "enabled" : "disabled"}` }, gstSettings.enabled ? "Enabled" : "Disabled")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react14.default.createElement("label", null, "CGST Rate:"), /* @__PURE__ */ import_react14.default.createElement("span", null, (gstSettings.cgst_percent || 0).toFixed(2), "%")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react14.default.createElement("label", null, "SGST Rate:"), /* @__PURE__ */ import_react14.default.createElement("span", null, (gstSettings.sgst_percent || 0).toFixed(2), "%")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react14.default.createElement("label", null, "Total GST:"), /* @__PURE__ */ import_react14.default.createElement("span", { className: "total-gst" }, calculateTotalGST().toFixed(2), "%")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "info-item" }, /* @__PURE__ */ import_react14.default.createElement("label", null, "Last Updated:"), /* @__PURE__ */ import_react14.default.createElement("span", null, gstSettings.updated_at ? new Date(gstSettings.updated_at).toLocaleString() : "Never")))), status && /* @__PURE__ */ import_react14.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react14.default.createElement("div", { className: "gst-edit" }, !isEditing ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "edit-actions" }, /* @__PURE__ */ import_react14.default.createElement(
     "button",
     {
       type: "button",
@@ -58234,7 +58259,7 @@ function GSTConfigurationSection() {
       className: "primary"
     },
     "Edit GST Settings"
-  )) : /* @__PURE__ */ import_react13.default.createElement("form", { className: "form-grid", onSubmit: handleGSTSubmit }, /* @__PURE__ */ import_react13.default.createElement("label", null, "CGST Rate (%)", /* @__PURE__ */ import_react13.default.createElement(
+  )) : /* @__PURE__ */ import_react14.default.createElement("form", { className: "form-grid", onSubmit: handleGSTSubmit }, /* @__PURE__ */ import_react14.default.createElement("label", null, "CGST Rate (%)", /* @__PURE__ */ import_react14.default.createElement(
     "input",
     {
       type: "number",
@@ -58245,7 +58270,7 @@ function GSTConfigurationSection() {
       onChange: (e2) => updateFormField("cgst_percent", e2.target.value),
       placeholder: "Enter CGST rate as percentage"
     }
-  )), /* @__PURE__ */ import_react13.default.createElement("label", null, "SGST Rate (%)", /* @__PURE__ */ import_react13.default.createElement(
+  )), /* @__PURE__ */ import_react14.default.createElement("label", null, "SGST Rate (%)", /* @__PURE__ */ import_react14.default.createElement(
     "input",
     {
       type: "number",
@@ -58256,14 +58281,14 @@ function GSTConfigurationSection() {
       onChange: (e2) => updateFormField("sgst_percent", e2.target.value),
       placeholder: "Enter SGST rate as percentage"
     }
-  )), /* @__PURE__ */ import_react13.default.createElement("label", { className: "checkbox-label" }, /* @__PURE__ */ import_react13.default.createElement(
+  )), /* @__PURE__ */ import_react14.default.createElement("label", { className: "checkbox-label" }, /* @__PURE__ */ import_react14.default.createElement(
     "input",
     {
       type: "checkbox",
       checked: form.enabled,
       onChange: (e2) => updateFormField("enabled", e2.target.checked)
     }
-  ), "Enable GST Calculations"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react13.default.createElement("button", { type: "submit" }, "Update GST Settings"), /* @__PURE__ */ import_react13.default.createElement(
+  ), "Enable GST Calculations"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "form-actions" }, /* @__PURE__ */ import_react14.default.createElement("button", { type: "submit" }, "Update GST Settings"), /* @__PURE__ */ import_react14.default.createElement(
     "button",
     {
       type: "button",
@@ -58275,9 +58300,9 @@ function GSTConfigurationSection() {
 }
 
 // src/renderer/admin/components/ReportingSection.jsx
-var import_react14 = __toESM(require_react());
+var import_react15 = __toESM(require_react());
 function ReportingSection() {
-  return /* @__PURE__ */ import_react14.default.createElement("section", null, /* @__PURE__ */ import_react14.default.createElement("h2", null, "Reporting"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "placeholder" }, /* @__PURE__ */ import_react14.default.createElement("p", null, "Reporting functionality coming soon."), /* @__PURE__ */ import_react14.default.createElement("p", null, "This will include:"), /* @__PURE__ */ import_react14.default.createElement("ul", null, /* @__PURE__ */ import_react14.default.createElement("li", null, "Sales reports"), /* @__PURE__ */ import_react14.default.createElement("li", null, "Inventory reports"), /* @__PURE__ */ import_react14.default.createElement("li", null, "GST reports"), /* @__PURE__ */ import_react14.default.createElement("li", null, "Customer reports"), /* @__PURE__ */ import_react14.default.createElement("li", null, "Financial summaries"))));
+  return /* @__PURE__ */ import_react15.default.createElement("section", null, /* @__PURE__ */ import_react15.default.createElement("h2", null, "Reporting"), /* @__PURE__ */ import_react15.default.createElement("div", { className: "placeholder" }, /* @__PURE__ */ import_react15.default.createElement("p", null, "Reporting functionality coming soon."), /* @__PURE__ */ import_react15.default.createElement("p", null, "This will include:"), /* @__PURE__ */ import_react15.default.createElement("ul", null, /* @__PURE__ */ import_react15.default.createElement("li", null, "Sales reports"), /* @__PURE__ */ import_react15.default.createElement("li", null, "Inventory reports"), /* @__PURE__ */ import_react15.default.createElement("li", null, "GST reports"), /* @__PURE__ */ import_react15.default.createElement("li", null, "Customer reports"), /* @__PURE__ */ import_react15.default.createElement("li", null, "Financial summaries"))));
 }
 
 // src/renderer/admin/constants.js
@@ -58293,17 +58318,17 @@ var emptyItem = { name: "", category: "", unit: "Nos", quantity: "", rate: "" };
 var units = ["Nos", "Mtrs", "Kgs"];
 
 // src/renderer/admin/hooks/useStatusMessage.js
-var import_react15 = __toESM(require_react());
+var import_react16 = __toESM(require_react());
 function useStatusMessage2() {
-  const [status, setStatus] = (0, import_react15.useState)(null);
+  const [status, setStatus] = (0, import_react16.useState)(null);
   const clearStatus = () => setStatus(null);
   return [status, setStatus, clearStatus];
 }
 
 // src/renderer/index.jsx
 function LoginScreen({ onLogin, company }) {
-  const [name, setName] = (0, import_react16.useState)("");
-  const [password, setPassword] = (0, import_react16.useState)("");
+  const [name, setName] = (0, import_react17.useState)("");
+  const [password, setPassword] = (0, import_react17.useState)("");
   const [status, setStatus] = useStatusMessage();
   const companyName = company?.name?.trim() || "Textile Prime";
   const companySubtitle = company?.gstin ? `GSTIN: ${company.gstin}` : "Textile Job Work Suite";
@@ -58321,33 +58346,33 @@ function LoginScreen({ onLogin, company }) {
       setStatus({ type: "error", text: error.message || "Login failed" });
     }
   }
-  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "login-screen" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "login-panel" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "login-brand" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "logo-circle large" }, companyName.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react16.default.createElement("div", null, /* @__PURE__ */ import_react16.default.createElement("p", { className: "subtitle" }, companySubtitle), /* @__PURE__ */ import_react16.default.createElement("h1", null, companyName), /* @__PURE__ */ import_react16.default.createElement("p", { className: "tagline" }, companyTagline))), /* @__PURE__ */ import_react16.default.createElement("form", { className: "login-card", onSubmit: handleSubmit }, /* @__PURE__ */ import_react16.default.createElement("h2", null, "Sign in"), /* @__PURE__ */ import_react16.default.createElement("label", null, "Username", /* @__PURE__ */ import_react16.default.createElement("input", { value: name, onChange: (e2) => setName(e2.target.value), required: true })), /* @__PURE__ */ import_react16.default.createElement("label", null, "Password", /* @__PURE__ */ import_react16.default.createElement("input", { type: "password", value: password, onChange: (e2) => setPassword(e2.target.value), required: true })), /* @__PURE__ */ import_react16.default.createElement("button", { type: "submit" }, "Login"), status && /* @__PURE__ */ import_react16.default.createElement("div", { className: `status ${status.type}` }, status.text))));
+  return /* @__PURE__ */ import_react17.default.createElement("div", { className: "login-screen" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "login-panel" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "login-brand" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "logo-circle large" }, companyName.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react17.default.createElement("div", null, /* @__PURE__ */ import_react17.default.createElement("p", { className: "subtitle" }, companySubtitle), /* @__PURE__ */ import_react17.default.createElement("h1", null, companyName), /* @__PURE__ */ import_react17.default.createElement("p", { className: "tagline" }, companyTagline))), /* @__PURE__ */ import_react17.default.createElement("form", { className: "login-card", onSubmit: handleSubmit }, /* @__PURE__ */ import_react17.default.createElement("h2", null, "Sign in"), /* @__PURE__ */ import_react17.default.createElement("label", null, "Username", /* @__PURE__ */ import_react17.default.createElement("input", { value: name, onChange: (e2) => setName(e2.target.value), required: true })), /* @__PURE__ */ import_react17.default.createElement("label", null, "Password", /* @__PURE__ */ import_react17.default.createElement("input", { type: "password", value: password, onChange: (e2) => setPassword(e2.target.value), required: true })), /* @__PURE__ */ import_react17.default.createElement("button", { type: "submit" }, "Login"), status && /* @__PURE__ */ import_react17.default.createElement("div", { className: `status ${status.type}` }, status.text))));
 }
 function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
   const api = window.api;
-  const [activeTab, setActiveTab] = (0, import_react16.useState)("billing");
+  const [activeTab, setActiveTab] = (0, import_react17.useState)("billing");
   const [status, setStatus] = useStatusMessage();
-  const [customers, setCustomers] = (0, import_react16.useState)([]);
-  const [customerForm, setCustomerForm] = (0, import_react16.useState)(emptyCustomer);
-  const [editingCustomerId, setEditingCustomerId] = (0, import_react16.useState)(null);
-  const [items, setItems] = (0, import_react16.useState)([]);
-  const [invoiceDate, setInvoiceDate] = (0, import_react16.useState)((/* @__PURE__ */ new Date()).toISOString().slice(0, 10));
-  const [invoiceCustomerId, setInvoiceCustomerId] = (0, import_react16.useState)("");
-  const [invoiceItems, setInvoiceItems] = (0, import_react16.useState)([]);
-  const [invoiceNotes, setInvoiceNotes] = (0, import_react16.useState)("");
-  const [nextInvoiceNumber, setNextInvoiceNumber] = (0, import_react16.useState)(1);
-  const [invoices, setInvoices] = (0, import_react16.useState)([]);
-  const [selectedInvoice, setSelectedInvoice] = (0, import_react16.useState)(null);
-  const [invoiceDetails, setInvoiceDetails] = (0, import_react16.useState)(null);
-  (0, import_react16.useEffect)(() => {
+  const [customers, setCustomers] = (0, import_react17.useState)([]);
+  const [customerForm, setCustomerForm] = (0, import_react17.useState)(emptyCustomer);
+  const [editingCustomerId, setEditingCustomerId] = (0, import_react17.useState)(null);
+  const [items, setItems] = (0, import_react17.useState)([]);
+  const [invoiceDate, setInvoiceDate] = (0, import_react17.useState)((/* @__PURE__ */ new Date()).toISOString().slice(0, 10));
+  const [invoiceCustomerId, setInvoiceCustomerId] = (0, import_react17.useState)("");
+  const [invoiceItems, setInvoiceItems] = (0, import_react17.useState)([]);
+  const [invoiceNotes, setInvoiceNotes] = (0, import_react17.useState)("");
+  const [nextInvoiceNumber, setNextInvoiceNumber] = (0, import_react17.useState)(1);
+  const [invoices, setInvoices] = (0, import_react17.useState)([]);
+  const [selectedInvoice, setSelectedInvoice] = (0, import_react17.useState)(null);
+  const [invoiceDetails, setInvoiceDetails] = (0, import_react17.useState)(null);
+  (0, import_react17.useEffect)(() => {
     refreshAll();
   }, []);
-  const [gstSettings, setGSTSettings] = (0, import_react16.useState)({
+  const [gstSettings, setGSTSettings] = (0, import_react17.useState)({
     cgst_percent: 2.5,
     sgst_percent: 2.5,
     enabled: true
   });
-  const invoiceSummary = (0, import_react16.useMemo)(() => {
+  const invoiceSummary = (0, import_react17.useMemo)(() => {
     const subtotal = invoiceItems.reduce((sum, item) => sum + (item.amount || 0), 0);
     let cgst = 0;
     let sgst = 0;
@@ -58543,13 +58568,13 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
       setStatus({ type: "error", text: error.message || "Failed to load invoice details" });
     }
   }
-  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "app-shell" }, /* @__PURE__ */ import_react16.default.createElement(AppHeader, { onLogout, user, company: initialCompany }), /* @__PURE__ */ import_react16.default.createElement(TabBar, { tabs: TAB_DEFINITIONS, activeTab, onChange: setActiveTab }), status && /* @__PURE__ */ import_react16.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react16.default.createElement("main", null, activeTab === "profile" && /* @__PURE__ */ import_react16.default.createElement(
+  return /* @__PURE__ */ import_react17.default.createElement("div", { className: "app-shell" }, /* @__PURE__ */ import_react17.default.createElement(AppHeader, { onLogout, user, company: initialCompany, items }), /* @__PURE__ */ import_react17.default.createElement(TabBar, { tabs: TAB_DEFINITIONS, activeTab, onChange: setActiveTab }), status && /* @__PURE__ */ import_react17.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react17.default.createElement("main", null, activeTab === "profile" && /* @__PURE__ */ import_react17.default.createElement(
     ProfileSection,
     {
       user,
       onUserUpdate: (updatedUser) => setUser((prev) => ({ ...prev, ...updatedUser }))
     }
-  ), activeTab === "customers" && /* @__PURE__ */ import_react16.default.createElement(
+  ), activeTab === "customers" && /* @__PURE__ */ import_react17.default.createElement(
     CustomersSection,
     {
       form: customerForm,
@@ -58561,7 +58586,7 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
       onDelete: handleCustomerDelete,
       onCancelEdit: resetCustomerForm
     }
-  ), activeTab === "billing" && /* @__PURE__ */ import_react16.default.createElement(
+  ), activeTab === "billing" && /* @__PURE__ */ import_react17.default.createElement(
     BillingSection,
     {
       nextInvoiceNumber,
@@ -58581,7 +58606,7 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
       onNotesChange: setInvoiceNotes,
       onSubmit: handleInvoiceSave
     }
-  ), activeTab === "invoices" && /* @__PURE__ */ import_react16.default.createElement(
+  ), activeTab === "invoices" && /* @__PURE__ */ import_react17.default.createElement(
     InvoicesSection,
     {
       invoices,
@@ -58594,17 +58619,17 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
 }
 function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
   const api = window.api;
-  const [activeTab, setActiveTab] = (0, import_react16.useState)("company");
+  const [activeTab, setActiveTab] = (0, import_react17.useState)("company");
   const [status, setStatus] = useStatusMessage2();
-  const [companyForm, setCompanyForm] = (0, import_react16.useState)(emptyCompany);
-  const [company, setCompany] = (0, import_react16.useState)(initialCompany || null);
-  const [items, setItems] = (0, import_react16.useState)([]);
-  const [itemForm, setItemForm] = (0, import_react16.useState)(emptyItem);
-  const [editingItemId, setEditingItemId] = (0, import_react16.useState)(null);
-  (0, import_react16.useEffect)(() => {
+  const [companyForm, setCompanyForm] = (0, import_react17.useState)(emptyCompany);
+  const [company, setCompany] = (0, import_react17.useState)(initialCompany || null);
+  const [items, setItems] = (0, import_react17.useState)([]);
+  const [itemForm, setItemForm] = (0, import_react17.useState)(emptyItem);
+  const [editingItemId, setEditingItemId] = (0, import_react17.useState)(null);
+  (0, import_react17.useEffect)(() => {
     refreshAll();
   }, []);
-  (0, import_react16.useEffect)(() => {
+  (0, import_react17.useEffect)(() => {
     if (initialCompany) {
       setCompany(initialCompany);
       setCompanyForm({
@@ -58705,14 +58730,14 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
     });
     setEditingItemId(item.id);
   }
-  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "app-shell" }, /* @__PURE__ */ import_react16.default.createElement(AppHeader2, { onLogout, user, company }), /* @__PURE__ */ import_react16.default.createElement(TabBar2, { tabs: TAB_DEFINITIONS2, activeTab, onChange: setActiveTab }), status && /* @__PURE__ */ import_react16.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react16.default.createElement("main", null, activeTab === "company" && /* @__PURE__ */ import_react16.default.createElement(
+  return /* @__PURE__ */ import_react17.default.createElement("div", { className: "app-shell" }, /* @__PURE__ */ import_react17.default.createElement(AppHeader2, { onLogout, user, company, items }), /* @__PURE__ */ import_react17.default.createElement(TabBar2, { tabs: TAB_DEFINITIONS2, activeTab, onChange: setActiveTab }), status && /* @__PURE__ */ import_react17.default.createElement("div", { className: `status ${status.type}` }, status.text), /* @__PURE__ */ import_react17.default.createElement("main", null, activeTab === "company" && /* @__PURE__ */ import_react17.default.createElement(
     CompanySection,
     {
       form: companyForm,
       onFieldChange: updateCompanyField,
       onSubmit: handleCompanySave
     }
-  ), activeTab === "inventory" && /* @__PURE__ */ import_react16.default.createElement(
+  ), activeTab === "inventory" && /* @__PURE__ */ import_react17.default.createElement(
     InventorySection,
     {
       form: itemForm,
@@ -58726,20 +58751,20 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
       onRefresh: refreshItems,
       onDelete: handleItemDelete
     }
-  ), activeTab === "users" && /* @__PURE__ */ import_react16.default.createElement(UserManagementSection, null), activeTab === "gst" && /* @__PURE__ */ import_react16.default.createElement(GSTConfigurationSection, null), activeTab === "reports" && /* @__PURE__ */ import_react16.default.createElement(ReportingSection, null)));
+  ), activeTab === "users" && /* @__PURE__ */ import_react17.default.createElement(UserManagementSection, null), activeTab === "gst" && /* @__PURE__ */ import_react17.default.createElement(GSTConfigurationSection, null), activeTab === "reports" && /* @__PURE__ */ import_react17.default.createElement(ReportingSection, null)));
 }
 function App() {
-  const [user, setUser2] = (0, import_react16.useState)(null);
-  const [company, setCompany] = (0, import_react16.useState)(null);
-  (0, import_react16.useEffect)(() => {
+  const [user, setUser2] = (0, import_react17.useState)(null);
+  const [company, setCompany] = (0, import_react17.useState)(null);
+  (0, import_react17.useEffect)(() => {
     window.api.getCompany().then((data) => setCompany(data)).catch(() => {
     });
   }, []);
   if (!user) {
-    return /* @__PURE__ */ import_react16.default.createElement(LoginScreen, { onLogin: setUser2, company });
+    return /* @__PURE__ */ import_react17.default.createElement(LoginScreen, { onLogin: setUser2, company });
   }
   if (user.role === "admin") {
-    return /* @__PURE__ */ import_react16.default.createElement(
+    return /* @__PURE__ */ import_react17.default.createElement(
       AdminApp,
       {
         onLogout: () => setUser2(null),
@@ -58749,7 +58774,7 @@ function App() {
       }
     );
   }
-  return /* @__PURE__ */ import_react16.default.createElement(
+  return /* @__PURE__ */ import_react17.default.createElement(
     PosApp,
     {
       onLogout: () => setUser2(null),
@@ -58760,7 +58785,7 @@ function App() {
   );
 }
 var container = document.getElementById("root");
-(0, import_client.createRoot)(container).render(/* @__PURE__ */ import_react16.default.createElement(App, null));
+(0, import_client.createRoot)(container).render(/* @__PURE__ */ import_react17.default.createElement(App, null));
 /*! Bundled license information:
 
 react/cjs/react.development.js:

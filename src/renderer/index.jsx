@@ -325,7 +325,7 @@ const invoiceSummary = useMemo(() => {
 
   return (
     <div className="app-shell">
-      <AppHeader onLogout={onLogout} user={user} company={initialCompany} />
+      <AppHeader onLogout={onLogout} user={user} company={initialCompany} items={items} />
 
       <TabBar tabs={TAB_DEFINITIONS} activeTab={activeTab} onChange={setActiveTab} />
 
@@ -521,7 +521,7 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
 
   return (
     <div className="app-shell">
-      <AdminAppHeader onLogout={onLogout} user={user} company={company} />
+      <AdminAppHeader onLogout={onLogout} user={user} company={company} items={items} />
 
       <AdminTabBar tabs={ADMIN_TAB_DEFINITIONS} activeTab={activeTab} onChange={setActiveTab} />
 
