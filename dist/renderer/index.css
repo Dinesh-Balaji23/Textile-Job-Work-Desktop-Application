@@ -400,6 +400,15 @@ td.empty {
 .invoice-detail .placeholder {
   color: #6b7280;
 }
+.invoice-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.invoice-header-actions h3 {
+  margin: 0;
+}
 @media (max-width: 1024px) {
   .login-panel {
     grid-template-columns: 1fr;

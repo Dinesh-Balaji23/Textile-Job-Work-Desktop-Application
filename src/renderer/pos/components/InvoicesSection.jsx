@@ -1,7 +1,9 @@
 import React from 'react';
 import { formatCurrency } from '../utils/format';
+import { downloadInvoicePDF } from '../../utils/invoicePDF';
 
-export function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, onSelect }) {
+// PDF Invoice functionality
+export function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, company, onSelect }) {
   return (
     <section className="invoices-view">
       <h2>Invoices</h2>
@@ -43,7 +45,26 @@ export function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, onS
         <div className="invoice-detail">
           {invoiceDetails ? (
             <div>
-              <h3>Invoice #{invoiceDetails.invoice.invoice_number}</h3>
+              <div className="invoice-header-actions">
+                <h3>Invoice #{invoiceDetails.invoice.invoice_number}</h3>
+                <button 
+                  className="primary"
+                  onClick={() => downloadInvoicePDF(
+                    invoiceDetails.invoice,
+                    company,
+                    {
+                      name: invoiceDetails.invoice.customer_name,
+                      address: invoiceDetails.invoice.customer_address,
+                      gstin: invoiceDetails.invoice.customer_gstin,
+                      state: invoiceDetails.invoice.customer_state,
+                      state_code: invoiceDetails.invoice.customer_state_code
+                    },
+                    invoiceDetails.items
+                  )}
+                >
+                  Download PDF
+                </button>
+              </div>
               <p>
                 <strong>Date:</strong> {invoiceDetails.invoice.invoice_date}
               </p>

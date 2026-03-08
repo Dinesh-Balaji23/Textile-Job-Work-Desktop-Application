@@ -11,6 +11,7 @@
     "dev": "concurrently \"npm:build:watch\" \"npm:electron\""
   },
   "dependencies": {
+    "jspdf": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sql.js": "^1.9.0"

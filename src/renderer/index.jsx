@@ -382,6 +382,7 @@ const invoiceSummary = useMemo(() => {
             invoices={invoices}
             selectedInvoice={selectedInvoice}
             invoiceDetails={invoiceDetails}
+            company={initialCompany}
             onSelect={handleInvoiceSelect}
           />
         )}
