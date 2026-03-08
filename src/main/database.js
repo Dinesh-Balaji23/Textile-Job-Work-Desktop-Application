@@ -249,6 +249,34 @@ async function getUser(id) {
   return queryOne(db, 'SELECT id, name, role FROM users WHERE id = :id', { id });
 }
 
+async function updateUserByName(name, updates) {
+  const db = await getDb();
+  const updateFields = [];
+  const params = { name };
+  
+  if (updates.name !== undefined) {
+    updateFields.push('name = :newName');
+    params.newName = updates.name;
+  }
+  
+  if (updateFields.length === 0) {
+    throw new Error('No fields to update');
+  }
+  
+  run(
+    db,
+    `UPDATE users SET ${updateFields.join(', ')} WHERE name = :name`,
+    params
+  );
+  await persist();
+  return getUserByName(updates.name || name);
+}
+
+async function getUserByName(name) {
+  const db = await getDb();
+  return queryOne(db, 'SELECT id, name, role FROM users WHERE name = :name', { name });
+}
+
 async function saveCompany(payload) {
   const db = await getDb();
   run(
@@ -496,6 +524,8 @@ module.exports = {
   updateUser,
   deleteUser,
   getUser,
+  getUserByName,
+  updateUserByName,
   getCompany,
   saveCompany,
   listCustomers,

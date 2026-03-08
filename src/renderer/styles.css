@@ -522,3 +522,76 @@ td.empty {
   align-items: flex-end;
   margin-top: 8px;
 }
+
+/* Profile Section Styling */
+.profile-info {
+  margin-bottom: 24px;
+}
+
+.info-card {
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 20px 40px rgba(15, 23, 42, 0.07);
+}
+
+.info-card h3 {
+  margin: 0 0 16px 0;
+  color: var(--brand-primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item label {
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-right: 12px;
+}
+
+.info-item span {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.profile-edit {
+  background: white;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.edit-actions .primary {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-dark));
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-actions .primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(0, 109, 119, 0.3);
+}

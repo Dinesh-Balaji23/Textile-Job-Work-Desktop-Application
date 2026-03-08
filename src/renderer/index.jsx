@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './styles.css';
 import { AppHeader } from './pos/components/AppHeader';
 import { TabBar } from './pos/components/TabBar';
+import { ProfileSection } from './pos/components/ProfileSection';
 import { CustomersSection } from './pos/components/CustomersSection';
 import { BillingSection } from './pos/components/BillingSection';
 import { InvoicesSection } from './pos/components/InvoicesSection';
@@ -300,6 +301,13 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
       )}
 
       <main>
+        {activeTab === 'profile' && (
+          <ProfileSection 
+            user={user} 
+            onUserUpdate={(updatedUser) => setUser(prev => ({ ...prev, ...updatedUser }))}
+          />
+        )}
+
         {activeTab === 'customers' && (
           <CustomersSection
             form={customerForm}
