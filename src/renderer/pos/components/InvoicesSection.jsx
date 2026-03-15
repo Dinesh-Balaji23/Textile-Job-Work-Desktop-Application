@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatCurrency } from '../utils/format';
 import { downloadInvoicePDF } from '../../utils/invoicePDF';
 
 // PDF Invoice functionality
-export function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, company, onSelect }) {
+export const InvoicesSection = React.memo(function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, company, onSelect }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
+  
+  const totalPages = Math.max(1, Math.ceil(invoices.length / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedInvoices = invoices.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <section className="invoices-view">
       <h2>Invoices</h2>
@@ -19,7 +26,7 @@ export function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, com
               </tr>
             </thead>
             <tbody>
-              {invoices.map((invoice) => (
+              {paginatedInvoices.map((invoice) => (
                 <tr
                   key={invoice.id}
                   className={selectedInvoice?.id === invoice.id ? 'selected' : ''}
@@ -31,7 +38,7 @@ export function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, com
                   <td>{formatCurrency(invoice.total)}</td>
                 </tr>
               ))}
-              {!invoices.length && (
+              {!paginatedInvoices.length && (
                 <tr>
                   <td colSpan={4} className="empty">
                     No invoices recorded yet.
@@ -40,6 +47,24 @@ export function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, com
               )}
             </tbody>
           </table>
+          
+          {totalPages > 1 && (
+            <div className="pagination" style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '15px' }}>
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span style={{ alignSelf: 'center' }}>Page {currentPage} of {totalPages}</span>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="invoice-detail">
@@ -121,4 +146,4 @@ export function InvoicesSection({ invoices, selectedInvoice, invoiceDetails, com
       </div>
     </section>
   );
-}
+});

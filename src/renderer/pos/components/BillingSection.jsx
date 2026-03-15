@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { formatCurrency } from '../utils/format';
 
 export function BillingSection({
@@ -19,6 +19,21 @@ export function BillingSection({
   onNotesChange,
   onSubmit
 }) {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        onSubmit(e);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        onAddItem();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onSubmit, onAddItem]);
+
   return (
     <section>
       <div className="invoice-header">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { downloadReportPDF } from '../../utils/reportPDF';
 
-export function ReportsSection() {
+export const ReportsSection = React.memo(function ReportsSection() {
   const [activeReport, setActiveReport] = useState('sales');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -329,4 +329,4 @@ export function ReportsSection() {
       )}
     </section>
   );
-}
+});

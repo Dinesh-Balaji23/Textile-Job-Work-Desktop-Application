@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import { AppHeader } from './pos/components/AppHeader';
@@ -6,7 +6,8 @@ import { TabBar } from './pos/components/TabBar';
 import { ProfileSection } from './pos/components/ProfileSection';
 import { CustomersSection } from './pos/components/CustomersSection';
 import { BillingSection } from './pos/components/BillingSection';
-import { InvoicesSection } from './pos/components/InvoicesSection';
+
+const InvoicesSection = React.lazy(() => import('./pos/components/InvoicesSection').then(module => ({ default: module.InvoicesSection })));
 import { TAB_DEFINITIONS, emptyCustomer } from './pos/constants';
 import { useStatusMessage } from './pos/hooks/useStatusMessage';
 
@@ -16,7 +17,8 @@ import { CompanySection } from './admin/components/CompanySection';
 import { InventorySection } from './admin/components/InventorySection';
 import { UserManagementSection } from './admin/components/UserManagementSection';
 import { GSTConfigurationSection } from './admin/components/GSTConfigurationSection';
-import { ReportsSection } from './admin/components/ReportsSection';
+
+const ReportsSection = React.lazy(() => import('./admin/components/ReportsSection').then(module => ({ default: module.ReportsSection })));
 import { TAB_DEFINITIONS as ADMIN_TAB_DEFINITIONS, emptyCompany, emptyItem, units } from './admin/constants';
 import { useStatusMessage as useAdminStatusMessage } from './admin/hooks/useStatusMessage';
 
@@ -336,12 +338,13 @@ const invoiceSummary = useMemo(() => {
       )}
 
       <main>
-        {activeTab === 'profile' && (
-          <ProfileSection 
-            user={user} 
-            onUserUpdate={(updatedUser) => setUser(prev => ({ ...prev, ...updatedUser }))}
-          />
-        )}
+        <Suspense fallback={<div className="status info">Loading module...</div>}>
+          {activeTab === 'profile' && (
+            <ProfileSection 
+              user={user} 
+              onUserUpdate={(updatedUser) => setUser(prev => ({ ...prev, ...updatedUser }))}
+            />
+          )}
 
         {activeTab === 'customers' && (
           <CustomersSection
@@ -377,15 +380,16 @@ const invoiceSummary = useMemo(() => {
           />
         )}
 
-        {activeTab === 'invoices' && (
-          <InvoicesSection
-            invoices={invoices}
-            selectedInvoice={selectedInvoice}
-            invoiceDetails={invoiceDetails}
-            company={initialCompany}
-            onSelect={handleInvoiceSelect}
-          />
-        )}
+          {activeTab === 'invoices' && (
+            <InvoicesSection
+              invoices={invoices}
+              selectedInvoice={selectedInvoice}
+              invoiceDetails={invoiceDetails}
+              company={initialCompany}
+              onSelect={handleInvoiceSelect}
+            />
+          )}
+        </Suspense>
       </main>
     </div>
   );
@@ -532,13 +536,14 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
       )}
 
       <main>
-        {activeTab === 'company' && (
-          <CompanySection
-            form={companyForm}
-            onFieldChange={updateCompanyField}
-            onSubmit={handleCompanySave}
-          />
-        )}
+        <Suspense fallback={<div className="status info">Loading module...</div>}>
+          {activeTab === 'company' && (
+            <CompanySection
+              form={companyForm}
+              onFieldChange={updateCompanyField}
+              onSubmit={handleCompanySave}
+            />
+          )}
 
         {activeTab === 'inventory' && (
           <InventorySection
@@ -557,9 +562,10 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
 
         {activeTab === 'users' && <UserManagementSection />}
 
-        {activeTab === 'gst' && <GSTConfigurationSection />}
+          {activeTab === 'gst' && <GSTConfigurationSection />}
 
-        {activeTab === 'reports' && <ReportsSection />}
+          {activeTab === 'reports' && <ReportsSection />}
+        </Suspense>
       </main>
     </div>
   );
