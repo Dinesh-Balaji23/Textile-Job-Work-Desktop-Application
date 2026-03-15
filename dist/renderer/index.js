@@ -1090,7 +1090,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState9(initialState) {
+        function useState10(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1102,7 +1102,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect7(create2, deps) {
+        function useEffect8(create2, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create2, deps);
         }
@@ -1885,7 +1885,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect7;
+        exports.useEffect = useEffect8;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -1893,7 +1893,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo2;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState9;
+        exports.useState = useState10;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -58299,10 +58299,98 @@ function GSTConfigurationSection() {
   )))));
 }
 
-// src/renderer/admin/components/ReportingSection.jsx
+// src/renderer/admin/components/ReportsSection.jsx
 var import_react15 = __toESM(require_react());
-function ReportingSection() {
-  return /* @__PURE__ */ import_react15.default.createElement("section", null, /* @__PURE__ */ import_react15.default.createElement("h2", null, "Reporting"), /* @__PURE__ */ import_react15.default.createElement("div", { className: "placeholder" }, /* @__PURE__ */ import_react15.default.createElement("p", null, "Reporting functionality coming soon."), /* @__PURE__ */ import_react15.default.createElement("p", null, "This will include:"), /* @__PURE__ */ import_react15.default.createElement("ul", null, /* @__PURE__ */ import_react15.default.createElement("li", null, "Sales reports"), /* @__PURE__ */ import_react15.default.createElement("li", null, "Inventory reports"), /* @__PURE__ */ import_react15.default.createElement("li", null, "GST reports"), /* @__PURE__ */ import_react15.default.createElement("li", null, "Customer reports"), /* @__PURE__ */ import_react15.default.createElement("li", null, "Financial summaries"))));
+function ReportsSection() {
+  const [activeReport, setActiveReport] = (0, import_react15.useState)("sales");
+  const [startDate, setStartDate] = (0, import_react15.useState)("");
+  const [endDate, setEndDate] = (0, import_react15.useState)("");
+  const [reportData, setReportData] = (0, import_react15.useState)(null);
+  const [loading, setLoading] = (0, import_react15.useState)(false);
+  const [error, setError] = (0, import_react15.useState)("");
+  (0, import_react15.useEffect)(() => {
+    const today = /* @__PURE__ */ new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1e3);
+    setEndDate(today.toISOString().split("T")[0]);
+    setStartDate(thirtyDaysAgo.toISOString().split("T")[0]);
+  }, []);
+  const generateReport = async () => {
+    if (!startDate || !endDate) {
+      setError("Please select both start and end dates");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      let data;
+      switch (activeReport) {
+        case "sales":
+          data = await window.api.getSalesReport({ startDate, endDate });
+          break;
+        case "gst":
+          data = await window.api.getGSTReport({ startDate, endDate });
+          break;
+        case "inventory":
+          data = await window.api.getInventoryReport();
+          break;
+        default:
+          throw new Error("Invalid report type");
+      }
+      setReportData(data);
+    } catch (err2) {
+      setError(err2.message || "Failed to generate report");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const formatCurrency3 = (amount) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR"
+    }).format(amount || 0);
+  };
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+  };
+  const renderSalesReport = () => {
+    if (!reportData)
+      return null;
+    const { data, totals } = reportData;
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-content" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-summary" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total Sales"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, formatCurrency3(totals.totalSales))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total Bills"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, totals.totalBills)), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total Items Sold"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, totals.totalItems)), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Average Bill Value"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, formatCurrency3(totals.totalBills > 0 ? totals.totalSales / totals.totalBills : 0)))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-table-container" }, /* @__PURE__ */ import_react15.default.createElement("table", { className: "report-table" }, /* @__PURE__ */ import_react15.default.createElement("thead", null, /* @__PURE__ */ import_react15.default.createElement("tr", null, /* @__PURE__ */ import_react15.default.createElement("th", null, "Date"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Invoice #"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Customer"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Items"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Subtotal"), /* @__PURE__ */ import_react15.default.createElement("th", null, "CGST"), /* @__PURE__ */ import_react15.default.createElement("th", null, "SGST"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Total"))), /* @__PURE__ */ import_react15.default.createElement("tbody", null, data.map((row, index2) => /* @__PURE__ */ import_react15.default.createElement("tr", { key: index2 }, /* @__PURE__ */ import_react15.default.createElement("td", null, formatDate(row.date)), /* @__PURE__ */ import_react15.default.createElement("td", null, row.invoice_number), /* @__PURE__ */ import_react15.default.createElement("td", null, row.customer_name || "N/A"), /* @__PURE__ */ import_react15.default.createElement("td", null, row.item_count), /* @__PURE__ */ import_react15.default.createElement("td", null, formatCurrency3(row.subtotal)), /* @__PURE__ */ import_react15.default.createElement("td", null, formatCurrency3(row.cgst)), /* @__PURE__ */ import_react15.default.createElement("td", null, formatCurrency3(row.sgst)), /* @__PURE__ */ import_react15.default.createElement("td", { className: "total-column" }, formatCurrency3(row.total))))))));
+  };
+  const renderGSTReport = () => {
+    if (!reportData)
+      return null;
+    const { data, totals } = reportData;
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-content" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-summary" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total CGST"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, formatCurrency3(totals.totalCGST))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total SGST"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, formatCurrency3(totals.totalSGST))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total GST"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, formatCurrency3(totals.totalGST))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total Subtotal"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, formatCurrency3(totals.totalSubtotal)))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-table-container" }, /* @__PURE__ */ import_react15.default.createElement("table", { className: "report-table" }, /* @__PURE__ */ import_react15.default.createElement("thead", null, /* @__PURE__ */ import_react15.default.createElement("tr", null, /* @__PURE__ */ import_react15.default.createElement("th", null, "Date"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Invoice #"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Customer"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Subtotal"), /* @__PURE__ */ import_react15.default.createElement("th", null, "CGST"), /* @__PURE__ */ import_react15.default.createElement("th", null, "SGST"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Total"))), /* @__PURE__ */ import_react15.default.createElement("tbody", null, data.map((row, index2) => /* @__PURE__ */ import_react15.default.createElement("tr", { key: index2 }, /* @__PURE__ */ import_react15.default.createElement("td", null, formatDate(row.date)), /* @__PURE__ */ import_react15.default.createElement("td", null, row.invoice_number), /* @__PURE__ */ import_react15.default.createElement("td", null, row.customer_name || "N/A"), /* @__PURE__ */ import_react15.default.createElement("td", null, formatCurrency3(row.subtotal)), /* @__PURE__ */ import_react15.default.createElement("td", null, formatCurrency3(row.cgst)), /* @__PURE__ */ import_react15.default.createElement("td", null, formatCurrency3(row.sgst)), /* @__PURE__ */ import_react15.default.createElement("td", { className: "total-column" }, formatCurrency3(row.total))))))));
+  };
+  const renderInventoryReport = () => {
+    if (!reportData)
+      return null;
+    const { data, totals } = reportData;
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-content" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-summary" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total Items"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, totals.totalItems)), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total Quantity"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, totals.totalQuantity)), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Total Value"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value" }, formatCurrency3(totals.totalValue))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "summary-card" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, "Low Stock Items"), /* @__PURE__ */ import_react15.default.createElement("p", { className: "summary-value low-stock" }, totals.lowStockItems))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-table-container" }, /* @__PURE__ */ import_react15.default.createElement("table", { className: "report-table" }, /* @__PURE__ */ import_react15.default.createElement("thead", null, /* @__PURE__ */ import_react15.default.createElement("tr", null, /* @__PURE__ */ import_react15.default.createElement("th", null, "Item Name"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Category"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Unit"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Quantity"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Rate"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Total Value"), /* @__PURE__ */ import_react15.default.createElement("th", null, "Status"))), /* @__PURE__ */ import_react15.default.createElement("tbody", null, data.map((row, index2) => /* @__PURE__ */ import_react15.default.createElement("tr", { key: index2, className: row.stock_status === "Low Stock" ? "low-stock-row" : "" }, /* @__PURE__ */ import_react15.default.createElement("td", null, row.name), /* @__PURE__ */ import_react15.default.createElement("td", null, row.category || "N/A"), /* @__PURE__ */ import_react15.default.createElement("td", null, row.unit), /* @__PURE__ */ import_react15.default.createElement("td", null, row.quantity), /* @__PURE__ */ import_react15.default.createElement("td", null, formatCurrency3(row.rate)), /* @__PURE__ */ import_react15.default.createElement("td", null, formatCurrency3(row.total_value)), /* @__PURE__ */ import_react15.default.createElement("td", null, /* @__PURE__ */ import_react15.default.createElement("span", { className: `stock-status ${row.stock_status === "Low Stock" ? "low-stock" : "available"}` }, row.stock_status))))))));
+  };
+  return /* @__PURE__ */ import_react15.default.createElement("section", { className: "reports-section" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "reports-header" }, /* @__PURE__ */ import_react15.default.createElement("h2", null, "Reports"), /* @__PURE__ */ import_react15.default.createElement("p", null, "Generate and view business reports")), /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-controls" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-type-selector" }, /* @__PURE__ */ import_react15.default.createElement("label", null, "Report Type:"), /* @__PURE__ */ import_react15.default.createElement("select", { value: activeReport, onChange: (e2) => setActiveReport(e2.target.value) }, /* @__PURE__ */ import_react15.default.createElement("option", { value: "sales" }, "Sales Report"), /* @__PURE__ */ import_react15.default.createElement("option", { value: "gst" }, "GST Report"), /* @__PURE__ */ import_react15.default.createElement("option", { value: "inventory" }, "Inventory Report"))), activeReport !== "inventory" && /* @__PURE__ */ import_react15.default.createElement("div", { className: "date-range-selector" }, /* @__PURE__ */ import_react15.default.createElement("label", null, "From:"), /* @__PURE__ */ import_react15.default.createElement(
+    "input",
+    {
+      type: "date",
+      value: startDate,
+      onChange: (e2) => setStartDate(e2.target.value),
+      max: endDate
+    }
+  ), /* @__PURE__ */ import_react15.default.createElement("label", null, "To:"), /* @__PURE__ */ import_react15.default.createElement(
+    "input",
+    {
+      type: "date",
+      value: endDate,
+      onChange: (e2) => setEndDate(e2.target.value),
+      min: startDate
+    }
+  )), /* @__PURE__ */ import_react15.default.createElement("button", { className: "primary generate-btn", onClick: generateReport, disabled: loading }, loading ? "Generating..." : "Generate Report")), error && /* @__PURE__ */ import_react15.default.createElement("div", { className: "error-message" }, error), reportData && /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-container" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, activeReport === "sales" && "Sales Report", activeReport === "gst" && "GST Report", activeReport === "inventory" && "Inventory Report", activeReport !== "inventory" && ` (${formatDate(startDate)} - ${formatDate(endDate)})`), activeReport === "sales" && renderSalesReport(), activeReport === "gst" && renderGSTReport(), activeReport === "inventory" && renderInventoryReport()));
 }
 
 // src/renderer/admin/constants.js
@@ -58751,7 +58839,7 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
       onRefresh: refreshItems,
       onDelete: handleItemDelete
     }
-  ), activeTab === "users" && /* @__PURE__ */ import_react17.default.createElement(UserManagementSection, null), activeTab === "gst" && /* @__PURE__ */ import_react17.default.createElement(GSTConfigurationSection, null), activeTab === "reports" && /* @__PURE__ */ import_react17.default.createElement(ReportingSection, null)));
+  ), activeTab === "users" && /* @__PURE__ */ import_react17.default.createElement(UserManagementSection, null), activeTab === "gst" && /* @__PURE__ */ import_react17.default.createElement(GSTConfigurationSection, null), activeTab === "reports" && /* @__PURE__ */ import_react17.default.createElement(ReportsSection, null)));
 }
 function App() {
   const [user, setUser2] = (0, import_react17.useState)(null);

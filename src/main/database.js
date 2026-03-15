@@ -643,6 +643,181 @@ async function getNextInvoiceNumber() {
   return computeNextInvoiceNumber(db);
 }
 
+// Reports functions
+async function getSalesReport(startDate, endDate) {
+  const db = await getDb();
+  const query = `
+    SELECT 
+      i.invoice_date as date,
+      i.invoice_number,
+      i.total,
+      i.subtotal,
+      i.cgst,
+      i.sgst,
+      c.name as customer_name,
+      COUNT(ii.id) as item_count
+    FROM invoices i
+    LEFT JOIN customers c ON i.customer_id = c.id
+    LEFT JOIN invoice_items ii ON i.id = ii.invoice_id
+    WHERE i.invoice_date BETWEEN :startDate AND :endDate
+    GROUP BY i.id
+    ORDER BY i.invoice_date DESC
+  `;
+  
+  const results = queryAll(db, query, { startDate, endDate });
+  
+  // Calculate totals
+  const totals = results.reduce((acc, row) => ({
+    totalSales: acc.totalSales + row.total,
+    totalCGST: acc.totalCGST + row.cgst,
+    totalSGST: acc.totalSGST + row.sgst,
+    totalBills: acc.totalBills + 1,
+    totalItems: acc.totalItems + row.item_count
+  }), {
+    totalSales: 0,
+    totalCGST: 0,
+    totalSGST: 0,
+    totalBills: 0,
+    totalItems: 0
+  });
+  
+  return {
+    data: results,
+    totals,
+    period: { startDate, endDate }
+  };
+}
+
+async function getGSTReport(startDate, endDate) {
+  const db = await getDb();
+  const query = `
+    SELECT 
+      i.invoice_date as date,
+      i.invoice_number,
+      i.subtotal,
+      i.cgst,
+      i.sgst,
+      i.total,
+      c.name as customer_name
+    FROM invoices i
+    LEFT JOIN customers c ON i.customer_id = c.id
+    WHERE i.invoice_date BETWEEN :startDate AND :endDate
+      AND i.total > 0
+    ORDER BY i.invoice_date DESC
+  `;
+  
+  const results = queryAll(db, query, { startDate, endDate });
+  
+  // Calculate GST totals
+  const totals = results.reduce((acc, row) => ({
+    totalCGST: acc.totalCGST + row.cgst,
+    totalSGST: acc.totalSGST + row.sgst,
+    totalGST: acc.totalGST + row.cgst + row.sgst,
+    totalSubtotal: acc.totalSubtotal + row.subtotal,
+    totalInvoices: acc.totalInvoices + 1
+  }), {
+    totalCGST: 0,
+    totalSGST: 0,
+    totalGST: 0,
+    totalSubtotal: 0,
+    totalInvoices: 0
+  });
+  
+  return {
+    data: results,
+    totals,
+    period: { startDate, endDate }
+  };
+}
+
+async function getInventoryReport() {
+  const db = await getDb();
+  const query = `
+    SELECT 
+      id,
+      name,
+      category,
+      unit,
+      quantity,
+      rate,
+      quantity * rate as total_value,
+      CASE 
+        WHEN quantity < 20 THEN 'Low Stock'
+        ELSE 'Available'
+      END as stock_status
+    FROM items
+    ORDER BY 
+      CASE 
+        WHEN quantity < 20 THEN 0 
+        ELSE 1 
+      END,
+      name
+  `;
+  
+  const results = queryAll(db, query);
+  
+  // Calculate inventory totals
+  const totals = results.reduce((acc, row) => ({
+    totalItems: acc.totalItems + 1,
+    totalQuantity: acc.totalQuantity + row.quantity,
+    totalValue: acc.totalValue + row.total_value,
+    lowStockItems: acc.lowStockItems + (row.quantity < 20 ? 1 : 0)
+  }), {
+    totalItems: 0,
+    totalQuantity: 0,
+    totalValue: 0,
+    lowStockItems: 0
+  });
+  
+  return {
+    data: results,
+    totals
+  };
+}
+
+async function getTopSellingItems(startDate, endDate, limit = 10) {
+  const db = await getDb();
+  const query = `
+    SELECT 
+      i.name,
+      i.category,
+      i.unit,
+      SUM(ii.quantity) as total_sold,
+      SUM(ii.amount) as total_revenue,
+      COUNT(DISTINCT ii.invoice_id) as invoice_count
+    FROM items i
+    INNER JOIN invoice_items ii ON i.id = ii.item_id
+    INNER JOIN invoices inv ON ii.invoice_id = inv.id
+    WHERE inv.invoice_date BETWEEN :startDate AND :endDate
+    GROUP BY i.id
+    ORDER BY total_sold DESC
+    LIMIT :limit
+  `;
+  
+  return queryAll(db, query, { startDate, endDate, limit });
+}
+
+async function getCustomerSalesReport(startDate, endDate) {
+  const db = await getDb();
+  const query = `
+    SELECT 
+      c.id,
+      c.name,
+      c.phone,
+      COUNT(DISTINCT i.id) as invoice_count,
+      SUM(i.total) as total_spent,
+      AVG(i.total) as avg_invoice_value,
+      MAX(i.invoice_date) as last_purchase_date
+    FROM customers c
+    LEFT JOIN invoices i ON c.id = i.customer_id
+    WHERE i.invoice_date BETWEEN :startDate AND :endDate OR i.invoice_date IS NULL
+    GROUP BY c.id
+    ORDER BY total_spent DESC
+  `;
+  
+  return queryAll(db, query, { startDate, endDate });
+}
+
 module.exports = {
   initializeDatabase,
   authenticateUser,
@@ -669,5 +844,10 @@ module.exports = {
   listInvoices,
   createInvoice,
   getInvoiceDetails,
-  getNextInvoiceNumber
+  getNextInvoiceNumber,
+  getSalesReport,
+  getGSTReport,
+  getInventoryReport,
+  getTopSellingItems,
+  getCustomerSalesReport
 };

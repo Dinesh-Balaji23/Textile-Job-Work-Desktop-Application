@@ -23,7 +23,12 @@ const channels = {
   listInvoices: 'db:listInvoices',
   getInvoiceDetails: 'db:getInvoiceDetails',
   createInvoice: 'db:createInvoice',
-  getNextInvoiceNumber: 'db:getNextInvoiceNumber'
+  getNextInvoiceNumber: 'db:getNextInvoiceNumber',
+  getSalesReport: 'db:getSalesReport',
+  getGSTReport: 'db:getGSTReport',
+  getInventoryReport: 'db:getInventoryReport',
+  getTopSellingItems: 'db:getTopSellingItems',
+  getCustomerSalesReport: 'db:getCustomerSalesReport'
 };
 
 contextBridge.exposeInMainWorld('api', {
@@ -49,5 +54,10 @@ contextBridge.exposeInMainWorld('api', {
   listInvoices: () => ipcRenderer.invoke(channels.listInvoices),
   getInvoiceDetails: (id) => ipcRenderer.invoke(channels.getInvoiceDetails, id),
   createInvoice: (payload) => ipcRenderer.invoke(channels.createInvoice, payload),
-  getNextInvoiceNumber: () => ipcRenderer.invoke(channels.getNextInvoiceNumber)
+  getNextInvoiceNumber: () => ipcRenderer.invoke(channels.getNextInvoiceNumber),
+  getSalesReport: (params) => ipcRenderer.invoke(channels.getSalesReport, params),
+  getGSTReport: (params) => ipcRenderer.invoke(channels.getGSTReport, params),
+  getInventoryReport: () => ipcRenderer.invoke(channels.getInventoryReport),
+  getTopSellingItems: (params) => ipcRenderer.invoke(channels.getTopSellingItems, params),
+  getCustomerSalesReport: (params) => ipcRenderer.invoke(channels.getCustomerSalesReport, params)
 });

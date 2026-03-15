@@ -35,7 +35,12 @@ const {
   listInvoices,
   createInvoice,
   getInvoiceDetails,
-  getNextInvoiceNumber
+  getNextInvoiceNumber,
+  getSalesReport,
+  getGSTReport,
+  getInventoryReport,
+  getTopSellingItems,
+  getCustomerSalesReport
 } = require('./database');
 let mainWindow;
 
@@ -95,6 +100,13 @@ function registerIpcHandlers() {
   ipcMain.handle('db:getInvoiceDetails', (_, id) => getInvoiceDetails(id));
   ipcMain.handle('db:createInvoice', (_, payload) => createInvoice(payload));
   ipcMain.handle('db:getNextInvoiceNumber', () => getNextInvoiceNumber());
+
+  // Report handlers
+  ipcMain.handle('db:getSalesReport', (_, { startDate, endDate }) => getSalesReport(startDate, endDate));
+  ipcMain.handle('db:getGSTReport', (_, { startDate, endDate }) => getGSTReport(startDate, endDate));
+  ipcMain.handle('db:getInventoryReport', () => getInventoryReport());
+  ipcMain.handle('db:getTopSellingItems', (_, { startDate, endDate, limit }) => getTopSellingItems(startDate, endDate, limit));
+  ipcMain.handle('db:getCustomerSalesReport', (_, { startDate, endDate }) => getCustomerSalesReport(startDate, endDate));
 }
 
 app.whenReady().then(async () => {

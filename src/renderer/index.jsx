@@ -16,7 +16,7 @@ import { CompanySection } from './admin/components/CompanySection';
 import { InventorySection } from './admin/components/InventorySection';
 import { UserManagementSection } from './admin/components/UserManagementSection';
 import { GSTConfigurationSection } from './admin/components/GSTConfigurationSection';
-import { ReportingSection } from './admin/components/ReportingSection';
+import { ReportsSection } from './admin/components/ReportsSection';
 import { TAB_DEFINITIONS as ADMIN_TAB_DEFINITIONS, emptyCompany, emptyItem, units } from './admin/constants';
 import { useStatusMessage as useAdminStatusMessage } from './admin/hooks/useStatusMessage';
 
@@ -559,7 +559,7 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
 
         {activeTab === 'gst' && <GSTConfigurationSection />}
 
-        {activeTab === 'reports' && <ReportingSection />}
+        {activeTab === 'reports' && <ReportsSection />}
       </main>
     </div>
   );
