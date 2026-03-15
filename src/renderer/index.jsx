@@ -73,7 +73,7 @@ function LoginScreen({ onLogin, company }) {
   );
 }
 
-function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
+function PosApp({ onLogout, user, initialCompany, onCompanyChange, onUserUpdate }) {
   const api = window.api;
   const [activeTab, setActiveTab] = useState('billing');
   const [status, setStatus] = useStatusMessage();
@@ -342,7 +342,7 @@ const invoiceSummary = useMemo(() => {
           {activeTab === 'profile' && (
             <ProfileSection 
               user={user} 
-              onUserUpdate={(updatedUser) => setUser(prev => ({ ...prev, ...updatedUser }))}
+              onUserUpdate={onUserUpdate}
             />
           )}
 
@@ -603,6 +603,7 @@ function App() {
       user={user}
       initialCompany={company}
       onCompanyChange={setCompany}
+      onUserUpdate={(updatedUser) => setUser(prev => ({ ...prev, ...updatedUser }))}
     />
   );
 }

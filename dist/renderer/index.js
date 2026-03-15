@@ -58892,7 +58892,7 @@ function LoginScreen({ onLogin, company }) {
   }
   return /* @__PURE__ */ import_react17.default.createElement("div", { className: "login-screen" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "login-panel" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "login-brand" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "logo-circle large" }, companyName.slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react17.default.createElement("div", null, /* @__PURE__ */ import_react17.default.createElement("p", { className: "subtitle" }, companySubtitle), /* @__PURE__ */ import_react17.default.createElement("h1", null, companyName), /* @__PURE__ */ import_react17.default.createElement("p", { className: "tagline" }, companyTagline))), /* @__PURE__ */ import_react17.default.createElement("form", { className: "login-card", onSubmit: handleSubmit }, /* @__PURE__ */ import_react17.default.createElement("h2", null, "Sign in"), /* @__PURE__ */ import_react17.default.createElement("label", null, "Username", /* @__PURE__ */ import_react17.default.createElement("input", { value: name, onChange: (e2) => setName(e2.target.value), required: true })), /* @__PURE__ */ import_react17.default.createElement("label", null, "Password", /* @__PURE__ */ import_react17.default.createElement("input", { type: "password", value: password, onChange: (e2) => setPassword(e2.target.value), required: true })), /* @__PURE__ */ import_react17.default.createElement("button", { type: "submit" }, "Login"), status && /* @__PURE__ */ import_react17.default.createElement("div", { className: `status ${status.type}` }, status.text))));
 }
-function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
+function PosApp({ onLogout, user, initialCompany, onCompanyChange, onUserUpdate }) {
   const api = window.api;
   const [activeTab, setActiveTab] = (0, import_react17.useState)("billing");
   const [status, setStatus] = useStatusMessage();
@@ -59116,7 +59116,7 @@ function PosApp({ onLogout, user, initialCompany, onCompanyChange }) {
     ProfileSection,
     {
       user,
-      onUserUpdate: (updatedUser) => setUser((prev) => ({ ...prev, ...updatedUser }))
+      onUserUpdate
     }
   ), activeTab === "customers" && /* @__PURE__ */ import_react17.default.createElement(
     CustomersSection,
@@ -59298,20 +59298,20 @@ function AdminApp({ onLogout, user, initialCompany, onCompanyChange }) {
   ), activeTab === "users" && /* @__PURE__ */ import_react17.default.createElement(UserManagementSection, null), activeTab === "gst" && /* @__PURE__ */ import_react17.default.createElement(GSTConfigurationSection, null), activeTab === "reports" && /* @__PURE__ */ import_react17.default.createElement(ReportsSection3, null))));
 }
 function App() {
-  const [user, setUser2] = (0, import_react17.useState)(null);
+  const [user, setUser] = (0, import_react17.useState)(null);
   const [company, setCompany] = (0, import_react17.useState)(null);
   (0, import_react17.useEffect)(() => {
     window.api.getCompany().then((data) => setCompany(data)).catch(() => {
     });
   }, []);
   if (!user) {
-    return /* @__PURE__ */ import_react17.default.createElement(LoginScreen, { onLogin: setUser2, company });
+    return /* @__PURE__ */ import_react17.default.createElement(LoginScreen, { onLogin: setUser, company });
   }
   if (user.role === "admin") {
     return /* @__PURE__ */ import_react17.default.createElement(
       AdminApp,
       {
-        onLogout: () => setUser2(null),
+        onLogout: () => setUser(null),
         user,
         initialCompany: company,
         onCompanyChange: setCompany
@@ -59321,10 +59321,11 @@ function App() {
   return /* @__PURE__ */ import_react17.default.createElement(
     PosApp,
     {
-      onLogout: () => setUser2(null),
+      onLogout: () => setUser(null),
       user,
       initialCompany: company,
-      onCompanyChange: setCompany
+      onCompanyChange: setCompany,
+      onUserUpdate: (updatedUser) => setUser((prev) => ({ ...prev, ...updatedUser }))
     }
   );
 }
