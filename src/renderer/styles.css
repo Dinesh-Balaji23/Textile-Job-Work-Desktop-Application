@@ -1155,6 +1155,35 @@ td.empty {
   font-weight: 600;
 }
 
+.report-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.report-header-actions h3 {
+  margin: 0;
+}
+
+.download-pdf-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+
+.download-pdf-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
 .report-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

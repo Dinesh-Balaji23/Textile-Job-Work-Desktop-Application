@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { downloadReportPDF } from '../../utils/reportPDF';
 
 export function ReportsSection() {
   const [activeReport, setActiveReport] = useState('sales');
@@ -64,6 +65,20 @@ export function ReportsSection() {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const downloadPDF = () => {
+    if (!reportData) return;
+    
+    try {
+      const reportTitle = activeReport === 'sales' ? 'Sales Report' : 
+                         activeReport === 'gst' ? 'GST Report' : 'Inventory Report';
+      const dateRange = activeReport !== 'inventory' ? { startDate, endDate } : null;
+      
+      downloadReportPDF(reportTitle, reportData, dateRange);
+    } catch (error) {
+      setError('Failed to generate PDF: ' + error.message);
+    }
   };
 
   const renderSalesReport = () => {
@@ -295,12 +310,17 @@ export function ReportsSection() {
 
       {reportData && (
         <div className="report-container">
-          <h3>
-            {activeReport === 'sales' && 'Sales Report'}
-            {activeReport === 'gst' && 'GST Report'}
-            {activeReport === 'inventory' && 'Inventory Report'}
-            {activeReport !== 'inventory' && ` (${formatDate(startDate)} - ${formatDate(endDate)})`}
-          </h3>
+          <div className="report-header-actions">
+            <h3>
+              {activeReport === 'sales' && 'Sales Report'}
+              {activeReport === 'gst' && 'GST Report'}
+              {activeReport === 'inventory' && 'Inventory Report'}
+              {activeReport !== 'inventory' && ` (${formatDate(startDate)} - ${formatDate(endDate)})`}
+            </h3>
+            <button className="download-pdf-btn" onClick={downloadPDF}>
+              Download PDF
+            </button>
+          </div>
 
           {activeReport === 'sales' && renderSalesReport()}
           {activeReport === 'gst' && renderGSTReport()}

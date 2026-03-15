@@ -43203,7 +43203,7 @@ function StockNotification({ items }) {
       className: "notification-btn",
       onClick: () => setShowDropdown(!showDropdown)
     },
-    /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-icon" }, /* @__PURE__ */ import_react.default.createElement("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round" }, /* @__PURE__ */ import_react.default.createElement("path", { d: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" }), /* @__PURE__ */ import_react.default.createElement("path", { d: "M13.73 21a2 2 0 0 1-3.46 0" })), notificationCount > 0 && /* @__PURE__ */ import_react.default.createElement("span", { className: "notification-badge" }, notificationCount))
+    /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-icon" }, /* @__PURE__ */ import_react.default.createElement("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, /* @__PURE__ */ import_react.default.createElement("path", { d: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3 2-3-9" }), /* @__PURE__ */ import_react.default.createElement("path", { d: "M13.73 21a2 2 0 0 1-3.46 0" })), notificationCount > 0 && /* @__PURE__ */ import_react.default.createElement("span", { className: "notification-badge" }, notificationCount))
   ), showDropdown && /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-dropdown" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-header" }, /* @__PURE__ */ import_react.default.createElement("h4", null, "Low Stock Alerts"), /* @__PURE__ */ import_react.default.createElement("span", { className: "notification-count" }, notificationCount, " items")), /* @__PURE__ */ import_react.default.createElement("div", { className: "notification-list" }, notificationCount > 0 ? lowStockItems.map((item) => /* @__PURE__ */ import_react.default.createElement("div", { key: item.id, className: "notification-item" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "item-info" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "item-name" }, item.name), /* @__PURE__ */ import_react.default.createElement("span", { className: "item-quantity" }, item.quantity, " ", item.unit)), /* @__PURE__ */ import_react.default.createElement("div", { className: "item-category" }, item.category || "Uncategorized"))) : /* @__PURE__ */ import_react.default.createElement("div", { className: "no-notifications" }, /* @__PURE__ */ import_react.default.createElement("span", { className: "no-notifications-icon" }, "\u2713"), /* @__PURE__ */ import_react.default.createElement("p", null, "All items are well stocked")))));
 }
 
@@ -58301,6 +58301,202 @@ function GSTConfigurationSection() {
 
 // src/renderer/admin/components/ReportsSection.jsx
 var import_react15 = __toESM(require_react());
+
+// src/renderer/utils/reportPDF.js
+function generateReportPDF(reportType, reportData, dateRange) {
+  const pdf = new E();
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  let yPosition = 20;
+  let pageNumber = 1;
+  function addPageWithFooter() {
+    pdf.addPage();
+    pageNumber++;
+    yPosition = 20;
+  }
+  function addFooter() {
+    pdf.setFontSize(8);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`Page ${pageNumber}`, pageWidth - 30, 285);
+    pdf.text(`Generated: ${(/* @__PURE__ */ new Date()).toLocaleString()}`, 20, 285);
+  }
+  pdf.setFontSize(16);
+  pdf.setFont("helvetica", "bold");
+  pdf.text(reportType.toUpperCase() + " REPORT", pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 15;
+  pdf.setFontSize(12);
+  pdf.setFont("helvetica", "normal");
+  if (dateRange) {
+    pdf.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, pageWidth / 2, yPosition, { align: "center" });
+  } else {
+    pdf.text(`Generated: ${(/* @__PURE__ */ new Date()).toLocaleDateString()}`, pageWidth / 2, yPosition, { align: "center" });
+  }
+  yPosition += 20;
+  if (reportData.totals) {
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("SUMMARY:", 20, yPosition);
+    yPosition += 10;
+    pdf.setFont("helvetica", "normal");
+    Object.entries(reportData.totals).forEach(([key, value]) => {
+      if (yPosition > 250) {
+        addFooter();
+        addPageWithFooter();
+      }
+      const label = formatLabel(key);
+      const formattedValue = formatValue(key, value);
+      pdf.text(`${label}: ${formattedValue}`, 30, yPosition);
+      yPosition += 8;
+    });
+    yPosition += 15;
+  }
+  if (reportData.data && reportData.data.length > 0) {
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("DETAILS:", 20, yPosition);
+    yPosition += 15;
+    console.log("PDF Report Data:", reportData);
+    console.log("Report Type:", reportType);
+    console.log("First Row:", reportData.data[0]);
+    const headers = getTableHeaders(reportType);
+    const columnPositions = getColumnPositions(reportType);
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(0, 0, 0);
+    console.log("Headers:", headers);
+    console.log("Column Positions:", columnPositions);
+    headers.forEach((header, index2) => {
+      console.log(`Drawing header "${header}" at position ${columnPositions[index2]}, y=${yPosition}`);
+      pdf.text(header, columnPositions[index2], yPosition);
+    });
+    const headerY = yPosition + 5;
+    pdf.setLineWidth(0.5);
+    pdf.line(20, headerY, 190, headerY);
+    yPosition = headerY + 10;
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(0, 0, 0);
+    reportData.data.forEach((row, rowIndex) => {
+      console.log(`Processing row ${rowIndex}:`, row);
+      if (yPosition > 250) {
+        addFooter();
+        addPageWithFooter();
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(0, 0, 0);
+        headers.forEach((header, index2) => {
+          pdf.text(header, columnPositions[index2], yPosition);
+        });
+        const newPageHeaderY = yPosition + 5;
+        pdf.setLineWidth(0.5);
+        pdf.line(20, newPageHeaderY, 190, newPageHeaderY);
+        yPosition = newPageHeaderY + 10;
+        pdf.setFont("helvetica", "normal");
+      }
+      const rowData = formatTableRow(row, reportType);
+      console.log(`Formatted row data:`, rowData);
+      rowData.forEach((cell, index2) => {
+        const cellText = String(cell || "").substring(0, 25);
+        console.log(`Drawing cell "${cellText}" at position ${columnPositions[index2]}, y=${yPosition}`);
+        pdf.text(cellText, columnPositions[index2], yPosition);
+      });
+      yPosition += 8;
+    });
+  }
+  addFooter();
+  return pdf;
+}
+function downloadReportPDF(reportType, reportData, dateRange) {
+  try {
+    const pdf = generateReportPDF(reportType, reportData, dateRange);
+    const fileName = `${reportType.toLowerCase().replace(/\s+/g, "_")}_report_${dateRange ? dateRange.startDate.replace(/-/g, "") : (/* @__PURE__ */ new Date()).toISOString().split("T")[0].replace(/-/g, "")}.pdf`;
+    pdf.save(fileName);
+  } catch (error) {
+    console.error("Error generating report PDF:", error);
+    throw error;
+  }
+}
+function formatLabel(key) {
+  const labels = {
+    totalSales: "Total Sales",
+    totalCGST: "Total CGST",
+    totalSGST: "Total SGST",
+    totalGST: "Total GST",
+    totalSubtotal: "Total Subtotal",
+    totalBills: "Total Bills",
+    totalItems: "Total Items",
+    totalInvoices: "Total Invoices",
+    totalQuantity: "Total Quantity",
+    totalValue: "Total Value",
+    lowStockItems: "Low Stock Items"
+  };
+  return labels[key] || key;
+}
+function formatValue(key, value) {
+  if (typeof value === "number") {
+    if (key.toLowerCase().includes("sales") || key.toLowerCase().includes("total") && (key.toLowerCase().includes("cgst") || key.toLowerCase().includes("sgst") || key.toLowerCase().includes("gst") || key.toLowerCase().includes("subtotal") || key.toLowerCase().includes("value"))) {
+      return `Rs. ${value.toFixed(2)}`;
+    }
+    return value.toString();
+  }
+  return value;
+}
+function getTableHeaders(reportType) {
+  const normalizedType = reportType.toLowerCase().replace(" report", "");
+  const headers = {
+    sales: ["Date", "Invoice #", "Customer", "Items", "Subtotal", "CGST", "SGST", "Total"],
+    gst: ["Date", "Invoice #", "Customer", "Subtotal", "CGST", "SGST", "Total"],
+    inventory: ["Item Name", "Category", "Unit", "Quantity", "Rate", "Total Value", "Status"]
+  };
+  return headers[normalizedType] || [];
+}
+function getColumnPositions(reportType) {
+  const normalizedType = reportType.toLowerCase().replace(" report", "");
+  const positions = {
+    sales: [20, 40, 58, 93, 108, 128, 150, 172],
+    gst: [20, 42, 62, 104, 128, 150, 172],
+    inventory: [20, 55, 80, 100, 120, 145, 172]
+  };
+  return positions[normalizedType] || [20, 40, 60, 85, 110, 135, 160, 185];
+}
+function formatTableRow(row, reportType) {
+  const normalizedType = reportType.toLowerCase().replace(" report", "");
+  switch (normalizedType) {
+    case "sales":
+      return [
+        row.date || "N/A",
+        String(row.invoice_number || ""),
+        String(row.customer_name || "N/A").substring(0, 20),
+        String(row.item_count || "0"),
+        `Rs. ${parseFloat(row.subtotal || 0).toFixed(2)}`,
+        `Rs. ${parseFloat(row.cgst || 0).toFixed(2)}`,
+        `Rs. ${parseFloat(row.sgst || 0).toFixed(2)}`,
+        `Rs. ${parseFloat(row.total || 0).toFixed(2)}`
+      ];
+    case "gst":
+      return [
+        row.date || "N/A",
+        String(row.invoice_number || ""),
+        String(row.customer_name || "N/A").substring(0, 20),
+        `Rs. ${parseFloat(row.subtotal || 0).toFixed(2)}`,
+        `Rs. ${parseFloat(row.cgst || 0).toFixed(2)}`,
+        `Rs. ${parseFloat(row.sgst || 0).toFixed(2)}`,
+        `Rs. ${parseFloat(row.total || 0).toFixed(2)}`
+      ];
+    case "inventory":
+      return [
+        String(row.name || "").substring(0, 20),
+        String(row.category || "N/A").substring(0, 15),
+        String(row.unit || ""),
+        String(row.quantity || "0"),
+        `Rs. ${parseFloat(row.rate || 0).toFixed(2)}`,
+        `Rs. ${parseFloat(row.total_value || 0).toFixed(2)}`,
+        String(row.stock_status || "N/A")
+      ];
+    default:
+      return Object.values(row).map((val) => String(val || ""));
+  }
+}
+
+// src/renderer/admin/components/ReportsSection.jsx
 function ReportsSection() {
   const [activeReport, setActiveReport] = (0, import_react15.useState)("sales");
   const [startDate, setStartDate] = (0, import_react15.useState)("");
@@ -58356,6 +58552,17 @@ function ReportsSection() {
       day: "numeric"
     });
   };
+  const downloadPDF = () => {
+    if (!reportData)
+      return;
+    try {
+      const reportTitle = activeReport === "sales" ? "Sales Report" : activeReport === "gst" ? "GST Report" : "Inventory Report";
+      const dateRange = activeReport !== "inventory" ? { startDate, endDate } : null;
+      downloadReportPDF(reportTitle, reportData, dateRange);
+    } catch (error2) {
+      setError("Failed to generate PDF: " + error2.message);
+    }
+  };
   const renderSalesReport = () => {
     if (!reportData)
       return null;
@@ -58390,7 +58597,7 @@ function ReportsSection() {
       onChange: (e2) => setEndDate(e2.target.value),
       min: startDate
     }
-  )), /* @__PURE__ */ import_react15.default.createElement("button", { className: "primary generate-btn", onClick: generateReport, disabled: loading }, loading ? "Generating..." : "Generate Report")), error && /* @__PURE__ */ import_react15.default.createElement("div", { className: "error-message" }, error), reportData && /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-container" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, activeReport === "sales" && "Sales Report", activeReport === "gst" && "GST Report", activeReport === "inventory" && "Inventory Report", activeReport !== "inventory" && ` (${formatDate(startDate)} - ${formatDate(endDate)})`), activeReport === "sales" && renderSalesReport(), activeReport === "gst" && renderGSTReport(), activeReport === "inventory" && renderInventoryReport()));
+  )), /* @__PURE__ */ import_react15.default.createElement("button", { className: "primary generate-btn", onClick: generateReport, disabled: loading }, loading ? "Generating..." : "Generate Report")), error && /* @__PURE__ */ import_react15.default.createElement("div", { className: "error-message" }, error), reportData && /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-container" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "report-header-actions" }, /* @__PURE__ */ import_react15.default.createElement("h3", null, activeReport === "sales" && "Sales Report", activeReport === "gst" && "GST Report", activeReport === "inventory" && "Inventory Report", activeReport !== "inventory" && ` (${formatDate(startDate)} - ${formatDate(endDate)})`), /* @__PURE__ */ import_react15.default.createElement("button", { className: "download-pdf-btn", onClick: downloadPDF }, "Download PDF")), activeReport === "sales" && renderSalesReport(), activeReport === "gst" && renderGSTReport(), activeReport === "inventory" && renderInventoryReport()));
 }
 
 // src/renderer/admin/constants.js
