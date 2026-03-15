@@ -16,35 +16,51 @@ export function generateReportPDF(reportType, reportData, dateRange) {
   // Helper function to add footer
   function addFooter() {
     pdf.setFontSize(8);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Page ${pageNumber}`, pageWidth - 30, 285);
+    pdf.setFont('helvetica', 'italic');
+    pdf.setTextColor(150, 150, 150);
+    pdf.text(`Page ${pageNumber}`, pageWidth / 2, 285, { align: 'center' });
     pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, 285);
+    pdf.setDrawColor(220, 220, 220);
+    pdf.setLineWidth(0.5);
+    pdf.line(20, 280, 190, 280);
   }
 
+  // Banner background
+  pdf.setFillColor(52, 73, 94); // Dark blue header banner
+  pdf.rect(0, 0, pageWidth, 40, 'F');
+  
   // Title
-  pdf.setFontSize(16);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(22);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(reportType.toUpperCase() + ' REPORT', pageWidth / 2, yPosition, { align: 'center' });
-  yPosition += 15;
+  const cleanTitle = reportType.toLowerCase().replace(' report', '').toUpperCase();
+  pdf.text(`${cleanTitle} REPORT`, pageWidth / 2, 22, { align: 'center' });
 
   // Date range
-  pdf.setFontSize(12);
+  pdf.setFontSize(11);
   pdf.setFont('helvetica', 'normal');
   if (dateRange) {
-    pdf.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, pageWidth / 2, yPosition, { align: 'center' });
+    pdf.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, pageWidth / 2, 32, { align: 'center' });
   } else {
-    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
+    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 32, { align: 'center' });
   }
-  yPosition += 20;
+  yPosition = 50;
 
   // Summary
   if (reportData.totals) {
+    pdf.setFillColor(245, 247, 250);
+    pdf.setDrawColor(220, 224, 230);
+    const summaryHeight = (Object.keys(reportData.totals).length * 8) + 12;
+    pdf.rect(20, yPosition - 5, 170, summaryHeight, 'FD');
+
     pdf.setFontSize(12);
+    pdf.setTextColor(44, 62, 80);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('SUMMARY:', 20, yPosition);
+    pdf.text('SUMMARY', 25, yPosition + 2);
     yPosition += 10;
 
     pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(52, 73, 94);
     Object.entries(reportData.totals).forEach(([key, value]) => {
       if (yPosition > 250) {
         addFooter();
@@ -52,7 +68,10 @@ export function generateReportPDF(reportType, reportData, dateRange) {
       }
       const label = formatLabel(key);
       const formattedValue = formatValue(key, value);
-      pdf.text(`${label}: ${formattedValue}`, 30, yPosition);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`${label}:`, 30, yPosition + 2);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${formattedValue}`, 80, yPosition + 2);
       yPosition += 8;
     });
     yPosition += 15;
@@ -60,71 +79,69 @@ export function generateReportPDF(reportType, reportData, dateRange) {
 
   // Table data
   if (reportData.data && reportData.data.length > 0) {
-    pdf.setFontSize(12);
+    pdf.setFontSize(14);
+    pdf.setTextColor(52, 73, 94);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('DETAILS:', 20, yPosition);
-    yPosition += 15;
+    pdf.text('DETAILS', 20, yPosition);
+    yPosition += 10;
 
-    // Debug: Log the data structure
-    console.log('PDF Report Data:', reportData);
-    console.log('Report Type:', reportType);
-    console.log('First Row:', reportData.data[0]);
-
-    // Headers with better spacing
     const headers = getTableHeaders(reportType);
     const columnPositions = getColumnPositions(reportType);
     
-    // Add headers with proper spacing
-    pdf.setFontSize(10);
+    // Header Row Background
+    const headerHeight = 9;
+    pdf.setFillColor(65, 84, 104);
+    pdf.rect(18, yPosition - 6, 174, headerHeight, 'F');
+
+    // Headers
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(0, 0, 0); // Ensure black text
-    console.log('Headers:', headers);
-    console.log('Column Positions:', columnPositions);
+    pdf.setTextColor(255, 255, 255); 
     headers.forEach((header, index) => {
-      console.log(`Drawing header "${header}" at position ${columnPositions[index]}, y=${yPosition}`);
       pdf.text(header, columnPositions[index], yPosition);
     });
     
-    // Add line separator under headers
-    const headerY = yPosition + 5;
-    pdf.setLineWidth(0.5);
-    pdf.line(20, headerY, 190, headerY);
-    yPosition = headerY + 10;
+    yPosition += headerHeight;
 
-    // Data rows with proper spacing
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(0, 0, 0); // Ensure black text for data too
+    // Data rows
+    pdf.setFontSize(9);
     reportData.data.forEach((row, rowIndex) => {
-      console.log(`Processing row ${rowIndex}:`, row);
-      if (yPosition > 250) {
+      if (yPosition > 270) {
         addFooter();
         addPageWithFooter();
         
-        // Repeat headers on new page
-        pdf.setFontSize(10);
+        // Header on new page
+        pdf.setFillColor(65, 84, 104);
+        pdf.rect(18, yPosition - 6, 174, headerHeight, 'F');
         pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(0, 0, 0); // Ensure black text
+        pdf.setTextColor(255, 255, 255);
         headers.forEach((header, index) => {
           pdf.text(header, columnPositions[index], yPosition);
         });
-        
-        // Add line separator under headers on new page
-        const newPageHeaderY = yPosition + 5;
-        pdf.setLineWidth(0.5);
-        pdf.line(20, newPageHeaderY, 190, newPageHeaderY);
-        yPosition = newPageHeaderY + 10;
-        pdf.setFont('helvetica', 'normal');
+        yPosition += headerHeight;
       }
       
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(44, 62, 80);
+      
+      // Zebra striping
+      if (rowIndex % 2 === 0) {
+        pdf.setFillColor(248, 249, 250);
+        pdf.rect(18, yPosition - 6, 174, 8, 'F');
+      }
+
       const rowData = formatTableRow(row, reportType);
-      console.log(`Formatted row data:`, rowData);
       rowData.forEach((cell, index) => {
         const cellText = String(cell || '').substring(0, 25);
-        console.log(`Drawing cell "${cellText}" at position ${columnPositions[index]}, y=${yPosition}`);
         pdf.text(cellText, columnPositions[index], yPosition);
       });
       yPosition += 8;
     });
+
+    // Final table bottom line
+    pdf.setDrawColor(65, 84, 104);
+    pdf.setLineWidth(0.5);
+    pdf.line(18, yPosition - 6, 192, yPosition - 6);
   }
 
   // Add footer to last page
