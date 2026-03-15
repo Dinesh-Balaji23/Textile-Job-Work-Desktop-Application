@@ -35,8 +35,8 @@ export function generateInvoicePDF(invoice, company, customer, items) {
     doc.line(20, 280, 190, 280);
   }
 
-  // Banner Background (Dark Blue)
-  doc.setFillColor(52, 73, 94);
+  // Banner Background (Dark Green)
+  doc.setFillColor(34, 139, 34);
   doc.rect(0, 0, pageWidth, 40, 'F');
   
   // Header Text - Bright White
@@ -64,7 +64,7 @@ export function generateInvoicePDF(invoice, company, customer, items) {
   
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(52, 73, 94);
+  doc.setTextColor(34, 139, 34);
   doc.text(company?.address || 'Company Address', 25, yPosition + 8);
   doc.text(`Phone: ${company?.phone || 'N/A'}`, 25, yPosition + 14);
   doc.text(`GSTIN: ${company?.gstin || 'N/A'}`, 25, yPosition + 20);
@@ -85,7 +85,7 @@ export function generateInvoicePDF(invoice, company, customer, items) {
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(52, 73, 94);
+  doc.setTextColor(34, 139, 34);
   doc.text(customer?.address || 'N/A', 115, yPosition + 14);
   doc.text(`GSTIN: ${customer?.gstin || 'N/A'}`, 115, yPosition + 20);
   doc.text(`${customer?.state || 'N/A'} (${customer?.state_code || 'N/A'})`, 115, yPosition + 26);
@@ -94,7 +94,7 @@ export function generateInvoicePDF(invoice, company, customer, items) {
 
   // Table Headers
   const headerHeight = 9;
-  doc.setFillColor(65, 84, 104);
+  doc.setFillColor(46, 125, 50);
   doc.rect(18, yPosition - 6, 174, headerHeight, 'F');
 
   doc.setFontSize(9);
@@ -117,7 +117,7 @@ export function generateInvoicePDF(invoice, company, customer, items) {
       addPageWithFooter();
       
       // Repeat Header on new page
-      doc.setFillColor(65, 84, 104);
+      doc.setFillColor(46, 125, 50);
       doc.rect(18, yPosition - 6, 174, headerHeight, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(255, 255, 255);
@@ -135,7 +135,7 @@ export function generateInvoicePDF(invoice, company, customer, items) {
     }
 
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(44, 62, 80);
+    doc.setTextColor(34, 139, 34);
     
     doc.text(String(item.item_name || 'N/A').substring(0, 40), 20, yPosition);
     doc.text(String(item.quantity).substring(0, 15), 100, yPosition);
@@ -146,7 +146,7 @@ export function generateInvoicePDF(invoice, company, customer, items) {
   });
   
   // Table bottom border
-  doc.setDrawColor(65, 84, 104);
+  doc.setDrawColor(46, 125, 50);
   doc.setLineWidth(0.5);
   doc.line(18, yPosition - 6, 192, yPosition - 6);
 
@@ -158,7 +158,7 @@ export function generateInvoicePDF(invoice, company, customer, items) {
   doc.setDrawColor(220, 224, 230);
   doc.rect(110, yPosition - 5, 80, 42, 'FD'); 
   
-  doc.setTextColor(52, 73, 94);
+  doc.setTextColor(34, 139, 34);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.text('Subtotal:', 115, yPosition + 2);
@@ -182,7 +182,7 @@ export function generateInvoicePDF(invoice, company, customer, items) {
   doc.line(115, yPosition - 4, 185, yPosition - 4);
   
   doc.setFontSize(12);
-  doc.setTextColor(44, 62, 80);
+  doc.setTextColor(34, 139, 34);
   doc.setFont('helvetica', 'bold');
   doc.text('Total Amount:', 115, yPosition + 2);
   doc.text(`Rs. ${invoice.total.toFixed(2)}`, 160, yPosition + 2);

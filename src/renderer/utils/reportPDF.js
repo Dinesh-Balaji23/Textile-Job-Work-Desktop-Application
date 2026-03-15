@@ -26,7 +26,7 @@ export function generateReportPDF(reportType, reportData, dateRange) {
   }
 
   // Banner background
-  pdf.setFillColor(52, 73, 94); // Dark blue header banner
+  pdf.setFillColor(34, 139, 34); // Dark green header banner
   pdf.rect(0, 0, pageWidth, 40, 'F');
   
   // Title
@@ -80,7 +80,7 @@ export function generateReportPDF(reportType, reportData, dateRange) {
   // Table data
   if (reportData.data && reportData.data.length > 0) {
     pdf.setFontSize(14);
-    pdf.setTextColor(52, 73, 94);
+    pdf.setTextColor(34, 139, 34);
     pdf.setFont('helvetica', 'bold');
     pdf.text('DETAILS', 20, yPosition);
     yPosition += 10;
@@ -90,7 +90,7 @@ export function generateReportPDF(reportType, reportData, dateRange) {
     
     // Header Row Background
     const headerHeight = 9;
-    pdf.setFillColor(65, 84, 104);
+    pdf.setFillColor(46, 125, 50);
     pdf.rect(18, yPosition - 6, 174, headerHeight, 'F');
 
     // Headers
@@ -111,7 +111,7 @@ export function generateReportPDF(reportType, reportData, dateRange) {
         addPageWithFooter();
         
         // Header on new page
-        pdf.setFillColor(65, 84, 104);
+        pdf.setFillColor(46, 125, 50);
         pdf.rect(18, yPosition - 6, 174, headerHeight, 'F');
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(255, 255, 255);
@@ -122,7 +122,7 @@ export function generateReportPDF(reportType, reportData, dateRange) {
       }
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(44, 62, 80);
+      pdf.setTextColor(34, 139, 34);
       
       // Zebra striping
       if (rowIndex % 2 === 0) {
@@ -139,7 +139,7 @@ export function generateReportPDF(reportType, reportData, dateRange) {
     });
 
     // Final table bottom line
-    pdf.setDrawColor(65, 84, 104);
+    pdf.setDrawColor(46, 125, 50);
     pdf.setLineWidth(0.5);
     pdf.line(18, yPosition - 6, 192, yPosition - 6);
   }

@@ -57540,7 +57540,7 @@ function generateInvoicePDF(invoice, company, customer, items) {
     doc.setLineWidth(0.5);
     doc.line(20, 280, 190, 280);
   }
-  doc.setFillColor(52, 73, 94);
+  doc.setFillColor(34, 139, 34);
   doc.rect(0, 0, pageWidth, 40, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(22);
@@ -57559,7 +57559,7 @@ function generateInvoicePDF(invoice, company, customer, items) {
   doc.text(company?.name || "Your Company", 25, yPosition + 2);
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(52, 73, 94);
+  doc.setTextColor(34, 139, 34);
   doc.text(company?.address || "Company Address", 25, yPosition + 8);
   doc.text(`Phone: ${company?.phone || "N/A"}`, 25, yPosition + 14);
   doc.text(`GSTIN: ${company?.gstin || "N/A"}`, 25, yPosition + 20);
@@ -57575,13 +57575,13 @@ function generateInvoicePDF(invoice, company, customer, items) {
   doc.text(customer?.name || "N/A", 115, yPosition + 8);
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(52, 73, 94);
+  doc.setTextColor(34, 139, 34);
   doc.text(customer?.address || "N/A", 115, yPosition + 14);
   doc.text(`GSTIN: ${customer?.gstin || "N/A"}`, 115, yPosition + 20);
   doc.text(`${customer?.state || "N/A"} (${customer?.state_code || "N/A"})`, 115, yPosition + 26);
   yPosition += 45;
   const headerHeight = 9;
-  doc.setFillColor(65, 84, 104);
+  doc.setFillColor(46, 125, 50);
   doc.rect(18, yPosition - 6, 174, headerHeight, "F");
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
@@ -57596,7 +57596,7 @@ function generateInvoicePDF(invoice, company, customer, items) {
     if (yPosition > 230) {
       addFooter();
       addPageWithFooter();
-      doc.setFillColor(65, 84, 104);
+      doc.setFillColor(46, 125, 50);
       doc.rect(18, yPosition - 6, 174, headerHeight, "F");
       doc.setFont("helvetica", "bold");
       doc.setTextColor(255, 255, 255);
@@ -57611,21 +57611,21 @@ function generateInvoicePDF(invoice, company, customer, items) {
       doc.rect(18, yPosition - 6, 174, 8, "F");
     }
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(44, 62, 80);
+    doc.setTextColor(34, 139, 34);
     doc.text(String(item.item_name || "N/A").substring(0, 40), 20, yPosition);
     doc.text(String(item.quantity).substring(0, 15), 100, yPosition);
     doc.text(`Rs. ${item.rate.toFixed(2)}`, 130, yPosition);
     doc.text(`Rs. ${item.amount.toFixed(2)}`, 160, yPosition);
     yPosition += 8;
   });
-  doc.setDrawColor(65, 84, 104);
+  doc.setDrawColor(46, 125, 50);
   doc.setLineWidth(0.5);
   doc.line(18, yPosition - 6, 192, yPosition - 6);
   yPosition += 10;
   doc.setFillColor(245, 247, 250);
   doc.setDrawColor(220, 224, 230);
   doc.rect(110, yPosition - 5, 80, 42, "FD");
-  doc.setTextColor(52, 73, 94);
+  doc.setTextColor(34, 139, 34);
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
   doc.text("Subtotal:", 115, yPosition + 2);
@@ -57645,7 +57645,7 @@ function generateInvoicePDF(invoice, company, customer, items) {
   doc.setDrawColor(200, 200, 200);
   doc.line(115, yPosition - 4, 185, yPosition - 4);
   doc.setFontSize(12);
-  doc.setTextColor(44, 62, 80);
+  doc.setTextColor(34, 139, 34);
   doc.setFont("helvetica", "bold");
   doc.text("Total Amount:", 115, yPosition + 2);
   doc.text(`Rs. ${invoice.total.toFixed(2)}`, 160, yPosition + 2);
@@ -57749,7 +57749,7 @@ function generateReportPDF(reportType, reportData, dateRange) {
     pdf.setLineWidth(0.5);
     pdf.line(20, 280, 190, 280);
   }
-  pdf.setFillColor(52, 73, 94);
+  pdf.setFillColor(34, 139, 34);
   pdf.rect(0, 0, pageWidth, 40, "F");
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(22);
@@ -57793,14 +57793,14 @@ function generateReportPDF(reportType, reportData, dateRange) {
   }
   if (reportData.data && reportData.data.length > 0) {
     pdf.setFontSize(14);
-    pdf.setTextColor(52, 73, 94);
+    pdf.setTextColor(34, 139, 34);
     pdf.setFont("helvetica", "bold");
     pdf.text("DETAILS", 20, yPosition);
     yPosition += 10;
     const headers = getTableHeaders(reportType);
     const columnPositions = getColumnPositions(reportType);
     const headerHeight = 9;
-    pdf.setFillColor(65, 84, 104);
+    pdf.setFillColor(46, 125, 50);
     pdf.rect(18, yPosition - 6, 174, headerHeight, "F");
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "bold");
@@ -57814,7 +57814,7 @@ function generateReportPDF(reportType, reportData, dateRange) {
       if (yPosition > 270) {
         addFooter();
         addPageWithFooter();
-        pdf.setFillColor(65, 84, 104);
+        pdf.setFillColor(46, 125, 50);
         pdf.rect(18, yPosition - 6, 174, headerHeight, "F");
         pdf.setFont("helvetica", "bold");
         pdf.setTextColor(255, 255, 255);
@@ -57824,7 +57824,7 @@ function generateReportPDF(reportType, reportData, dateRange) {
         yPosition += headerHeight;
       }
       pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(44, 62, 80);
+      pdf.setTextColor(34, 139, 34);
       if (rowIndex % 2 === 0) {
         pdf.setFillColor(248, 249, 250);
         pdf.rect(18, yPosition - 6, 174, 8, "F");
@@ -57836,7 +57836,7 @@ function generateReportPDF(reportType, reportData, dateRange) {
       });
       yPosition += 8;
     });
-    pdf.setDrawColor(65, 84, 104);
+    pdf.setDrawColor(46, 125, 50);
     pdf.setLineWidth(0.5);
     pdf.line(18, yPosition - 6, 192, yPosition - 6);
   }
