@@ -1090,7 +1090,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState11(initialState) {
+        function useState12(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1893,7 +1893,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo2;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState11;
+        exports.useState = useState12;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -58235,6 +58235,176 @@ function CustomersSection({
 // src/renderer/pos/components/BillingSection.jsx
 var import_react6 = __toESM(require_react());
 init_format();
+
+// src/renderer/utils/razorpayConfig.js
+var RAZORPAY_CONFIG = {
+  // Use test keys for development - replace with production keys in production
+  KEY_ID: "rzp_test_SSLTswmM3QolqX",
+  KEY_SECRET: "7jRt1mIWAaCqBxgKO0QlENbv",
+  // Payment options
+  CURRENCY: "INR",
+  // Theme configuration
+  THEME: {
+    color: "#3399cc",
+    backdrop_color: "#ffffff"
+  },
+  // Modal configuration
+  MODAL: {
+    escape: false,
+    handleback: true,
+    confirm_close: true,
+    animation: "slideFromBottom",
+    persist: "none"
+  },
+  // Test mode configuration
+  TEST_MODE: true,
+  TEST_CUSTOMER: {
+    name: "Test Customer",
+    email: "test@example.com",
+    phone: "9999999999"
+  }
+};
+var loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
+var openRazorpayCheckout = (options) => {
+  if (!window.Razorpay) {
+    throw new Error("Razorpay SDK not loaded");
+  }
+  const razorpay = new window.Razorpay(options);
+  razorpay.open();
+  return razorpay;
+};
+
+// src/renderer/utils/razorpayService.js
+var RazorpayService = class {
+  constructor() {
+    this.isLoaded = false;
+  }
+  // Initialize Razorpay SDK
+  async initialize() {
+    if (this.isLoaded)
+      return true;
+    const isScriptLoaded = await loadRazorpayScript();
+    if (!isScriptLoaded) {
+      throw new Error("Failed to load Razorpay SDK");
+    }
+    this.isLoaded = true;
+    return true;
+  }
+  // Create order options for Razorpay checkout
+  async createOrderOptions(orderData, invoiceData) {
+    const {
+      totalAmount,
+      customerName,
+      customerEmail,
+      customerPhone,
+      invoiceNumber
+    } = orderData;
+    try {
+      const order = await window.electronAPI.invoke("razorpay:createOrder", {
+        totalAmount,
+        customerInfo: {
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone
+        }
+      });
+      console.log("Razorpay: Order created successfully:", order);
+      return {
+        key: RAZORPAY_CONFIG.KEY_ID,
+        amount: totalAmount * 100,
+        // Convert to paise
+        currency: RAZORPAY_CONFIG.CURRENCY,
+        name: "Textile POS",
+        description: `Invoice #${invoiceNumber}`,
+        order_id: order.id,
+        prefill: {
+          name: customerName || "",
+          email: customerEmail || "",
+          contact: customerPhone || ""
+        },
+        theme: RAZORPAY_CONFIG.THEME,
+        modal: RAZORPAY_CONFIG.MODAL,
+        handler: (response) => {
+          this.handlePaymentSuccess(response, orderData, invoiceData);
+        },
+        notes: {
+          invoice_number: invoiceNumber,
+          customer_name: customerName
+        }
+      };
+    } catch (error) {
+      console.error("Razorpay: Order creation failed:", error);
+      throw new Error(`Failed to create payment order: ${error.message}`);
+    }
+  }
+  // Process payment for invoice
+  async processPayment(invoiceData, customerData) {
+    try {
+      await this.initialize();
+      console.log("Razorpay: Starting payment processing");
+      console.log("Razorpay: Invoice data:", invoiceData);
+      console.log("Razorpay: Customer data:", customerData);
+      if (!invoiceData) {
+        throw new Error("Invoice data is required");
+      }
+      if (!customerData) {
+        throw new Error("Customer data is required");
+      }
+      const orderData = {
+        totalAmount: invoiceData.total || 0,
+        customerName: customerData.name || "Test Customer",
+        customerEmail: customerData.email || "test@example.com",
+        customerPhone: customerData.phone || "9999999999",
+        invoiceNumber: invoiceData.invoice_number || "INV-000"
+      };
+      console.log("Razorpay: Order data created:", orderData);
+      const options = await this.createOrderOptions(orderData, invoiceData);
+      console.log("Razorpay: Opening checkout with options:", options);
+      return openRazorpayCheckout(options);
+    } catch (error) {
+      console.error("Payment processing error:", error);
+      throw error;
+    }
+  }
+  // Handle successful payment
+  handlePaymentSuccess(response, orderData, invoiceData) {
+    const event = new CustomEvent("razorpay:payment-success", {
+      detail: {
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_signature: response.razorpay_signature,
+        invoiceData,
+        orderData
+      }
+    });
+    document.dispatchEvent(event);
+  }
+  // Verify payment signature (should be done on backend)
+  async verifyPayment(response) {
+    try {
+      return await window.electronAPI.invoke("razorpay:verifyPayment", response);
+    } catch (error) {
+      console.error("Payment verification error:", error);
+      return false;
+    }
+  }
+};
+var razorpayService = new RazorpayService();
+
+// src/renderer/pos/components/BillingSection.jsx
 function BillingSection({
   nextInvoiceNumber,
   invoiceDate,
@@ -58253,6 +58423,8 @@ function BillingSection({
   onNotesChange,
   onSubmit
 }) {
+  const [paymentProcessing, setPaymentProcessing] = (0, import_react6.useState)(false);
+  const [paymentMethod, setPaymentMethod] = (0, import_react6.useState)("cash");
   (0, import_react6.useEffect)(() => {
     const handleKeyDown = (e2) => {
       if ((e2.ctrlKey || e2.metaKey) && e2.key === "s") {
@@ -58267,7 +58439,75 @@ function BillingSection({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onSubmit, onAddItem]);
-  return /* @__PURE__ */ import_react6.default.createElement("section", null, /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-header" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("h2", null, "Create Invoice"), /* @__PURE__ */ import_react6.default.createElement("p", null, "Invoice No. ", nextInvoiceNumber))), /* @__PURE__ */ import_react6.default.createElement("form", { onSubmit }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-meta" }, /* @__PURE__ */ import_react6.default.createElement("label", null, "Invoice Date", /* @__PURE__ */ import_react6.default.createElement("input", { type: "date", value: invoiceDate, onChange: (e2) => onDateChange(e2.target.value) })), /* @__PURE__ */ import_react6.default.createElement("label", null, "Customer", /* @__PURE__ */ import_react6.default.createElement("select", { value: invoiceCustomerId, onChange: (e2) => onCustomerChange(e2.target.value), required: true }, /* @__PURE__ */ import_react6.default.createElement("option", { value: "" }, "Select customer"), customers.map((customer) => /* @__PURE__ */ import_react6.default.createElement("option", { key: customer.id, value: customer.id }, customer.name))))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react6.default.createElement("table", { className: "invoice-table" }, /* @__PURE__ */ import_react6.default.createElement("thead", null, /* @__PURE__ */ import_react6.default.createElement("tr", null, /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "35%" } }, "Item"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Qty"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Rate"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Amount"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "10%" } }, "Actions"))), /* @__PURE__ */ import_react6.default.createElement("tbody", null, invoiceItems.map((row) => /* @__PURE__ */ import_react6.default.createElement("tr", { key: row.id }, /* @__PURE__ */ import_react6.default.createElement("td", null, /* @__PURE__ */ import_react6.default.createElement(
+  (0, import_react6.useEffect)(() => {
+    const handlePaymentSuccess = async (event) => {
+      const { razorpay_payment_id, razorpay_order_id, razorpay_signature, invoiceData } = event.detail;
+      try {
+        const verification = await window.electronAPI.invoke("razorpay:verifyPayment", {
+          razorpay_payment_id,
+          razorpay_order_id,
+          razorpay_signature
+        });
+        if (verification.verified) {
+          await window.electronAPI.invoke("razorpay:savePaymentRecord", {
+            payment_id: razorpay_payment_id,
+            order_id: razorpay_order_id,
+            invoice_number: invoiceData.invoice_number,
+            amount: invoiceData.total,
+            status: "paid",
+            payment_method: "razorpay"
+          });
+          await onSubmit(new Event("submit"));
+          alert("Payment successful! Invoice saved.");
+          setPaymentProcessing(false);
+        }
+      } catch (error) {
+        console.error("Payment verification failed:", error);
+        alert("Payment verification failed. Please contact support.");
+        setPaymentProcessing(false);
+      }
+    };
+    document.addEventListener("razorpay:payment-success", handlePaymentSuccess);
+    return () => document.removeEventListener("razorpay:payment-success", handlePaymentSuccess);
+  }, [onSubmit]);
+  const handlePayment = async (e2) => {
+    e2.preventDefault();
+    if (paymentMethod === "online") {
+      await processOnlinePayment(e2);
+    } else {
+      onSubmit(e2);
+    }
+  };
+  const processOnlinePayment = async (e2) => {
+    e2.preventDefault();
+    if (invoiceItems.length === 0) {
+      alert("Please add items before proceeding with payment.");
+      return;
+    }
+    setPaymentProcessing(true);
+    try {
+      const customer = {
+        name: "Test Customer",
+        // Default test customer name
+        email: "test@example.com",
+        phone: "9999999999"
+      };
+      const invoiceData = {
+        invoice_number: nextInvoiceNumber,
+        total: invoiceSummary.total || 0,
+        subtotal: invoiceSummary.subtotal || 0,
+        cgst: invoiceSummary.cgst || 0,
+        sgst: invoiceSummary.sgst || 0
+      };
+      console.log("Processing payment with data:", { invoiceData, customer });
+      await razorpayService.processPayment(invoiceData, customer);
+    } catch (error) {
+      console.error("Payment processing error:", error);
+      alert(`Payment failed: ${error.message}`);
+      setPaymentProcessing(false);
+    }
+  };
+  return /* @__PURE__ */ import_react6.default.createElement("section", null, /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-header" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("h2", null, "Create Invoice"), /* @__PURE__ */ import_react6.default.createElement("p", null, "Invoice No. ", nextInvoiceNumber))), /* @__PURE__ */ import_react6.default.createElement("form", { onSubmit: handlePayment }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "invoice-meta" }, /* @__PURE__ */ import_react6.default.createElement("label", null, "Invoice Date", /* @__PURE__ */ import_react6.default.createElement("input", { type: "date", value: invoiceDate, onChange: (e2) => onDateChange(e2.target.value) })), /* @__PURE__ */ import_react6.default.createElement("label", null, "Customer", /* @__PURE__ */ import_react6.default.createElement("select", { value: invoiceCustomerId, onChange: (e2) => onCustomerChange(e2.target.value), required: true }, /* @__PURE__ */ import_react6.default.createElement("option", { value: "" }, "Select customer"), customers.map((customer) => /* @__PURE__ */ import_react6.default.createElement("option", { key: customer.id, value: customer.id }, customer.name))))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "table-wrapper" }, /* @__PURE__ */ import_react6.default.createElement("table", { className: "invoice-table" }, /* @__PURE__ */ import_react6.default.createElement("thead", null, /* @__PURE__ */ import_react6.default.createElement("tr", null, /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "35%" } }, "Item"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Qty"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Rate"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "15%" } }, "Amount"), /* @__PURE__ */ import_react6.default.createElement("th", { style: { width: "10%" } }, "Actions"))), /* @__PURE__ */ import_react6.default.createElement("tbody", null, invoiceItems.map((row) => /* @__PURE__ */ import_react6.default.createElement("tr", { key: row.id }, /* @__PURE__ */ import_react6.default.createElement("td", null, /* @__PURE__ */ import_react6.default.createElement(
     "select",
     {
       value: row.item_id,
@@ -58304,7 +58544,27 @@ function BillingSection({
       onChange: (e2) => onNotesChange(e2.target.value),
       placeholder: "Optional notes"
     }
-  ))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "summary-box" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "Subtotal"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.subtotal))), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "CGST ", gstSettings.enabled ? invoiceSummary.cgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.cgst))), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "SGST ", gstSettings.enabled ? invoiceSummary.sgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.sgst))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "total" }, /* @__PURE__ */ import_react6.default.createElement("span", null, "Total"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.total))), /* @__PURE__ */ import_react6.default.createElement("button", { type: "submit" }, "Save Invoice")))));
+  ))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "summary-box" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "Subtotal"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.subtotal))), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "CGST ", gstSettings.enabled ? invoiceSummary.cgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.cgst))), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("span", null, "SGST ", gstSettings.enabled ? invoiceSummary.sgstRate || 2.5 : 0, "%"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.sgst))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "total" }, /* @__PURE__ */ import_react6.default.createElement("span", null, "Total"), /* @__PURE__ */ import_react6.default.createElement("strong", null, formatCurrency(invoiceSummary.total))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "payment-method" }, /* @__PURE__ */ import_react6.default.createElement("label", null, "Payment Method", /* @__PURE__ */ import_react6.default.createElement(
+    "select",
+    {
+      value: paymentMethod,
+      onChange: (e2) => setPaymentMethod(e2.target.value),
+      style: { marginBottom: "10px", width: "100%", padding: "5px" }
+    },
+    /* @__PURE__ */ import_react6.default.createElement("option", { value: "cash" }, "Cash"),
+    /* @__PURE__ */ import_react6.default.createElement("option", { value: "online" }, "Online Payment (Razorpay)")
+  ))), /* @__PURE__ */ import_react6.default.createElement(
+    "button",
+    {
+      type: "submit",
+      disabled: paymentProcessing,
+      style: {
+        backgroundColor: paymentMethod === "online" ? "#3399cc" : "#28a745",
+        cursor: paymentProcessing ? "not-allowed" : "pointer"
+      }
+    },
+    paymentProcessing ? "Processing..." : paymentMethod === "online" ? "Pay Online" : "Save Invoice"
+  )))));
 }
 
 // src/renderer/pos/constants.js

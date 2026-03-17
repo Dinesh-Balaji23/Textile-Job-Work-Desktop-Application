@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { formatCurrency } from '../utils/format';
+import { razorpayService } from '../../utils/razorpayService';
 
 export function BillingSection({
   nextInvoiceNumber,
@@ -19,6 +20,9 @@ export function BillingSection({
   onNotesChange,
   onSubmit
 }) {
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cash'); // 'cash' or 'online'
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -34,6 +38,96 @@ export function BillingSection({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onSubmit, onAddItem]);
 
+  useEffect(() => {
+    // Listen for Razorpay payment success
+    const handlePaymentSuccess = async (event) => {
+      const { razorpay_payment_id, razorpay_order_id, razorpay_signature, invoiceData } = event.detail;
+      
+      try {
+        // Verify payment with backend
+        const verification = await window.electronAPI.invoke('razorpay:verifyPayment', {
+          razorpay_payment_id,
+          razorpay_order_id,
+          razorpay_signature
+        });
+
+        if (verification.verified) {
+          // Save payment record
+          await window.electronAPI.invoke('razorpay:savePaymentRecord', {
+            payment_id: razorpay_payment_id,
+            order_id: razorpay_order_id,
+            invoice_number: invoiceData.invoice_number,
+            amount: invoiceData.total,
+            status: 'paid',
+            payment_method: 'razorpay'
+          });
+
+          // Now save the actual invoice to the database
+          await onSubmit(new Event('submit')); // Trigger the original invoice save
+
+          alert('Payment successful! Invoice saved.');
+          setPaymentProcessing(false);
+        }
+      } catch (error) {
+        console.error('Payment verification failed:', error);
+        alert('Payment verification failed. Please contact support.');
+        setPaymentProcessing(false);
+      }
+    };
+
+    document.addEventListener('razorpay:payment-success', handlePaymentSuccess);
+    return () => document.removeEventListener('razorpay:payment-success', handlePaymentSuccess);
+  }, [onSubmit]);
+
+  const handlePayment = async (e) => {
+    e.preventDefault();
+    
+    if (paymentMethod === 'online') {
+      await processOnlinePayment(e);
+    } else {
+      onSubmit(e);
+    }
+  };
+
+  const processOnlinePayment = async (e) => {
+    e.preventDefault();
+    
+    if (invoiceItems.length === 0) {
+      alert('Please add items before proceeding with payment.');
+      return;
+    }
+
+    setPaymentProcessing(true);
+
+    try {
+      // For test mode, use shop details instead of customer selection
+      const customer = {
+        name: 'Test Customer', // Default test customer name
+        email: 'test@example.com',
+        phone: '9999999999'
+      };
+      
+      // Create invoice data with validation
+      const invoiceData = {
+        invoice_number: nextInvoiceNumber,
+        total: invoiceSummary.total || 0,
+        subtotal: invoiceSummary.subtotal || 0,
+        cgst: invoiceSummary.cgst || 0,
+        sgst: invoiceSummary.sgst || 0
+      };
+
+      console.log('Processing payment with data:', { invoiceData, customer });
+
+      // Process payment with Razorpay
+      await razorpayService.processPayment(invoiceData, customer);
+      
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      alert(`Payment failed: ${error.message}`);
+      setPaymentProcessing(false);
+    }
+  };
+
   return (
     <section>
       <div className="invoice-header">
@@ -42,7 +136,7 @@ export function BillingSection({
           <p>Invoice No. {nextInvoiceNumber}</p>
         </div>
       </div>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handlePayment}>
         <div className="invoice-meta">
           <label>
             Invoice Date
@@ -163,7 +257,33 @@ export function BillingSection({
               <span>Total</span>
               <strong>{formatCurrency(invoiceSummary.total)}</strong>
             </div>
-            <button type="submit">Save Invoice</button>
+            
+            {/* Payment Method Selection */}
+            <div className="payment-method">
+              <label>
+                Payment Method
+                <select 
+                  value={paymentMethod} 
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  style={{ marginBottom: '10px', width: '100%', padding: '5px' }}
+                >
+                  <option value="cash">Cash</option>
+                  <option value="online">Online Payment (Razorpay)</option>
+                </select>
+              </label>
+            </div>
+            
+            <button 
+              type="submit" 
+              disabled={paymentProcessing}
+              style={{ 
+                backgroundColor: paymentMethod === 'online' ? '#3399cc' : '#28a745',
+                cursor: paymentProcessing ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {paymentProcessing ? 'Processing...' : 
+               paymentMethod === 'online' ? 'Pay Online' : 'Save Invoice'}
+            </button>
           </div>
         </div>
       </form>

@@ -28,7 +28,10 @@ const channels = {
   getGSTReport: 'db:getGSTReport',
   getInventoryReport: 'db:getInventoryReport',
   getTopSellingItems: 'db:getTopSellingItems',
-  getCustomerSalesReport: 'db:getCustomerSalesReport'
+  getCustomerSalesReport: 'db:getCustomerSalesReport',
+  createRazorpayOrder: 'razorpay:createOrder',
+  verifyRazorpayPayment: 'razorpay:verifyPayment',
+  saveRazorpayPaymentRecord: 'razorpay:savePaymentRecord'
 };
 
 contextBridge.exposeInMainWorld('api', {
@@ -59,5 +62,13 @@ contextBridge.exposeInMainWorld('api', {
   getGSTReport: (params) => ipcRenderer.invoke(channels.getGSTReport, params),
   getInventoryReport: () => ipcRenderer.invoke(channels.getInventoryReport),
   getTopSellingItems: (params) => ipcRenderer.invoke(channels.getTopSellingItems, params),
-  getCustomerSalesReport: (params) => ipcRenderer.invoke(channels.getCustomerSalesReport, params)
+  getCustomerSalesReport: (params) => ipcRenderer.invoke(channels.getCustomerSalesReport, params),
+  createRazorpayOrder: (payload) => ipcRenderer.invoke(channels.createRazorpayOrder, payload),
+  verifyRazorpayPayment: (payload) => ipcRenderer.invoke(channels.verifyRazorpayPayment, payload),
+  saveRazorpayPaymentRecord: (payload) => ipcRenderer.invoke(channels.saveRazorpayPaymentRecord, payload)
+});
+
+// Also expose electronAPI for backward compatibility
+contextBridge.exposeInMainWorld('electronAPI', {
+  invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
 });
